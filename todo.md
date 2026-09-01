@@ -41,3 +41,6 @@
 - [x] Diagnosticar por que o preview do site ficou indisponível após a sincronização
 - [x] Restaurar o servidor e confirmar um novo endereço de preview funcional
 - [ ] Documentar a causa da indisponibilidade temporária do preview e o procedimento de recuperação
+- [ ] Ampliar a explicação clicável das cinco competências com o que é avaliado, como pontuar melhor, erros comuns e exemplo prático
+- [ ] Validar a nova seção no preview e atualizar testes/build
+- [ ] Commitar e enviar todas as alterações para o GitHub público
