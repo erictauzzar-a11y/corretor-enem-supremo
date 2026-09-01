@@ -59,3 +59,8 @@ O código pode ser baixado pelo painel do projeto e enviado a colaboradores ou o
 ## Licença
 
 Distribuído sob a licença MIT. Consulte `LICENSE`.
+
+
+## Recuperação do preview
+
+O preview de desenvolvimento usa uma URL temporária vinculada ao servidor local gerenciado pelo ambiente. Após uma sincronização, alteração de dependências ou encerramento do processo, o endereço pode ficar indisponível temporariamente enquanto o servidor é reiniciado. Para recuperar o preview, use a opção de reiniciar o servidor no painel do projeto e aguarde o novo endereço ser disponibilizado; o código e o repositório público do GitHub não são apagados por esse reinício.

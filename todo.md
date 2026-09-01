@@ -32,9 +32,12 @@
 - [x] Validar o PDF corrigido com texto completo e confirmar que não há campos técnicos expostos
 - [x] Gerar um novo PDF após a correção dos rótulos e inspecionar o arquivo para confirmar que não há chaves técnicas
 - [x] Validar no preview que o PDF corrigido mostra apenas rótulos amigáveis em português
-- [ ] Renovar a autenticação do GitHub CLI para sincronizar as alterações recentes
-- [ ] Criar commit público com a correção do PDF e enviar para a branch main
-- [ ] Verificar no GitHub se a versão mais recente foi publicada
-- [ ] Renovar a autorização do GitHub CLI para sincronizar a versão mais recente
-- [ ] Commitar e enviar a correção de PDF para a branch main pública
-- [ ] Confirmar que todos os arquivos recentes estão no GitHub
+- [x] Renovar a autorização do GitHub CLI para sincronizar as alterações recentes
+- [x] Criar commit público com a correção do PDF e enviar para a branch main
+- [x] Verificar no GitHub se a versão mais recente foi publicada
+- [x] Renovar a autenticação do GitHub CLI para sincronizar a versão mais recente
+- [x] Commitar e enviar a correção de PDF para a branch main pública
+- [x] Confirmar que todos os arquivos recentes estão no GitHub
+- [x] Diagnosticar por que o preview do site ficou indisponível após a sincronização
+- [x] Restaurar o servidor e confirmar um novo endereço de preview funcional
+- [ ] Documentar a causa da indisponibilidade temporária do preview e o procedimento de recuperação
