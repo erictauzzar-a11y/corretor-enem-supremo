@@ -115,12 +115,16 @@ async function invokeGemini(text: string, imageDataUrl?: string) {
     if (!match) throw new Error("Imagem inválida: envie JPG ou PNG em formato válido.");
     parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
   }
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ENV.geminiModel}:generateContent?key=${encodeURIComponent(ENV.geminiApiKey)}`, {
-    method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ systemInstruction: { parts: [{ text: systemPrompt }] }, contents: [{ role: "user", parts }], generationConfig: { temperature: 0.2, responseMimeType: "application/json", responseSchema: geminiSchema } }),
-  });
-  const payload = await response.json() as { error?: { message?: string }; candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
-  if (!response.ok) throw new Error(`Gemini API (${response.status}): ${payload.error?.message ?? "erro desconhecido"}`);
+  const requestBody = JSON.stringify({ systemInstruction: { parts: [{ text: systemPrompt }] }, contents: [{ role: "user", parts }], generationConfig: { temperature: 0.2, responseMimeType: "application/json", responseSchema: geminiSchema } });
+  let response: Response;
+  let payload = {} as { error?: { message?: string }; candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ENV.geminiModel}:generateContent?key=${encodeURIComponent(ENV.geminiApiKey)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: requestBody });
+    payload = await response.json() as typeof payload;
+    if (response.ok) break;
+    if (![429, 500, 503].includes(response.status) || attempt === 2) throw new Error(`Gemini API (${response.status}): ${payload.error?.message ?? "erro desconhecido"}`);
+    await new Promise(resolve => setTimeout(resolve, 500 * (attempt + 1)));
+  }
   const jsonText = payload.candidates?.[0]?.content?.parts?.map(part => part.text ?? "").join("").trim();
   if (!jsonText) throw new Error("O Gemini não retornou uma análise utilizável.");
   return JSON.parse(jsonText);

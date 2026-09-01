@@ -48,6 +48,10 @@
 - [x] Configurar GEMINI_API_KEY e modelo por variáveis de ambiente
 - [x] Manter suporte a texto, imagem, resposta estruturada, parecer e PDF
 - [x] Atualizar documentação e exemplos seguros para outras IAs
-- [ ] Testar o fluxo com a API do Gemini e sincronizar todas as alterações no GitHub
+- [x] Testar o fluxo com a API do Gemini e sincronizar todas as alterações no GitHub
 - [x] Atualizar o modelo padrão para gemini-3.6-flash conforme disponibilidade real da conta
 - [x] Repetir o teste real de generateContent e remover o diagnóstico temporário
+- [x] Validar no navegador o fluxo completo com Gemini após a integração, incluindo carregamento e erro
+- [x] Validar o envio por imagem e a geração do PDF após a troca para Gemini
+- [x] Confirmar no GitHub a publicação de todos os arquivos relevantes da integração
+- [x] Adicionar tentativas automáticas para erros temporários 429/500/503 do Gemini
