@@ -43,7 +43,7 @@
 - [x] Documentar a causa da indisponibilidade temporária do preview e o procedimento de recuperação
 - [x] Ampliar a explicação clicável das cinco competências com o que é avaliado, como pontuar melhor, erros comuns e exemplo prático
 - [x] Validar a nova seção no preview e atualizar testes/build
-- [ ] Commitar e enviar todas as alterações para o GitHub público — push atual bloqueado por 403; requer credencial GitHub com permissão de escrita
+- [x] Commitar e enviar todas as alterações para o GitHub público — push concluído após renovação do GitHub CLI
 - [x] Integrar o Gemini por API no servidor sem expor a chave no cliente
 - [x] Configurar GEMINI_API_KEY e modelo por variáveis de ambiente
 - [x] Manter suporte a texto, imagem, resposta estruturada, parecer e PDF
@@ -53,5 +53,5 @@
 - [x] Repetir o teste real de generateContent e remover o diagnóstico temporário
 - [x] Validar no navegador o fluxo completo com Gemini após a integração, incluindo carregamento e erro
 - [x] Validar o envio por imagem e a geração do PDF após a troca para Gemini
-- [ ] Confirmar no GitHub a publicação de todos os arquivos relevantes da integração — push mais recente bloqueado por 403
+- [x] Confirmar no GitHub a publicação de todos os arquivos relevantes da integração — verificados na branch main
 - [x] Adicionar tentativas automáticas para erros temporários 429/500/503 do Gemini
