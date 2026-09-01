@@ -61,4 +61,4 @@
 - [x] Aplicar migração segura e verificar conexão com o Supabase
 - [x] Persistir correções autenticadas sem bloquear o fluxo atual de análise
 - [x] Adicionar testes Vitest para conexão, persistência e isolamento por usuário
-- [x] Atualizar documentação de configuração do Supabase e sincronizar no GitHub
+- [ ] Atualizar documentação de configuração do Supabase e sincronizar no GitHub — documentação e commit locais concluídos; publicação remota bloqueada por 403
