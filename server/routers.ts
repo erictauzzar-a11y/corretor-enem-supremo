@@ -1,7 +1,7 @@
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
-import { invokeLLM } from "./_core/llm";
+import { ENV } from "./_core/env";
 import { z } from "zod";
 
 const officialScore = z.union([z.literal(0), z.literal(40), z.literal(80), z.literal(120), z.literal(160), z.literal(200)]);
@@ -87,7 +87,44 @@ export const correctionInputSchema = z.object({
   imageDataUrl: z.string().max(12000000).optional(),
 }).refine(input => Boolean(input.text?.trim() || input.imageDataUrl), { message: "Envie o texto ou uma imagem da redação." });
 
-const systemPrompt = `Você é o Corretor ENEM Supremo, especialista na matriz oficial do ENEM. Corrija a redação com rigor, precisão e acolhimento pedagógico. A nota de cada competência só pode ser 0, 40, 80, 120, 160 ou 200; a nota final é a soma. Analise norma culta, tema, tipo dissertativo-argumentativo, repertório legítimo e produtivo, projeto de texto, coerência, coesão e proposta de intervenção. Para a Competência 5, avalie agente, ação, meio/modo, finalidade/efeito e detalhamento. Nunca invente erros: cite apenas problemas observáveis. Em namedFindings, use rótulos explícitos quando aplicável: "Desvios Gramaticais e Ortográficos", "Falhas de Estrutura Sintática", "Adequação ao Tema", "Tipo Textual", "Repertório Legítimo e Produtivo", "Projeto de Texto", "Coerência e Argumentação", "Coesão Interparágrafos", "Coesão Intraparágrafos" e "Inadequações Coesivas". Na intervenção, cada campo deve começar por "Identificado —" ou "Não identificado —", com a explicação correspondente. Se a imagem estiver ilegível, indique isso em warning. Responda exclusivamente no JSON solicitado, em português do Brasil.`;
+const systemPrompt = `Você é o Corretor ENEM Supremo, especialista na matriz oficial do ENEM. Corrija a redação com rigor, precisão e acolhimento pedagógico. A nota de cada competência só pode ser 0, 40, 80, 120, 160 ou 200; a nota final é a soma. Analise norma culta, tema, tipo dissertativo-argumentativo, repertório legítimo e produtivo, projeto de texto, coerência, coesão e proposta de intervenção. Para a Competência 5, avalie agente, ação, meio/modo, finalidade/efeito e detalhamento. Nunca invente erros: cite apenas problemas observáveis. Em protocolFindings, use exatamente as chaves técnicas do contrato e escreva os valores em português claro. Na intervenção, cada campo deve começar por "Identificado —" ou "Não identificado —", com a explicação correspondente. Se a imagem estiver ilegível, indique isso em warning. Responda exclusivamente no JSON solicitado, em português do Brasil.`;
+
+const geminiSchema = {
+  type: "OBJECT",
+  properties: {
+    finalScore: { type: "INTEGER" }, transcription: { type: "STRING" },
+    competencies: { type: "ARRAY", items: { type: "OBJECT", properties: {
+      score: { type: "INTEGER" }, title: { type: "STRING" }, summary: { type: "STRING" }, details: { type: "ARRAY", items: { type: "STRING" } }, verdict: { type: "STRING" },
+      protocolFindings: { type: "OBJECT", properties: {
+        grammar: { type: "STRING" }, syntax: { type: "STRING" }, theme: { type: "STRING" }, textType: { type: "STRING" }, repertoire: { type: "STRING" }, project: { type: "STRING" }, coherence: { type: "STRING" }, interparagraphCohesion: { type: "STRING" }, intraparagraphCohesion: { type: "STRING" }, cohesionInadequacies: { type: "STRING" }
+      }, required: ["grammar", "syntax", "theme", "textType", "repertoire", "project", "coherence", "interparagraphCohesion", "intraparagraphCohesion", "cohesionInadequacies"] }
+    }, required: ["score", "title", "summary", "details", "verdict", "protocolFindings"] } },
+    intervention: { type: "OBJECT", properties: {
+      agent: { type: "STRING" }, action: { type: "STRING" }, means: { type: "STRING" }, purpose: { type: "STRING" }, detail: { type: "STRING" }, viability: { type: "STRING" },
+      checklist: { type: "OBJECT", properties: { agent: { type: "STRING" }, action: { type: "STRING" }, means: { type: "STRING" }, purpose: { type: "STRING" }, detail: { type: "STRING" } }, required: ["agent", "action", "means", "purpose", "detail"] }
+    }, required: ["agent", "action", "means", "purpose", "detail", "viability", "checklist"] },
+    pedagogicalReport: { type: "STRING" }, warning: { type: "STRING" }
+  }, required: ["finalScore", "transcription", "competencies", "intervention", "pedagogicalReport", "warning"]
+} as const;
+
+async function invokeGemini(text: string, imageDataUrl?: string) {
+  if (!ENV.geminiApiKey) throw new Error("GEMINI_API_KEY não configurada no servidor.");
+  const parts: Array<Record<string, unknown>> = [{ text }];
+  if (imageDataUrl) {
+    const match = imageDataUrl.match(/^data:(image\/[^;]+);base64,(.+)$/);
+    if (!match) throw new Error("Imagem inválida: envie JPG ou PNG em formato válido.");
+    parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
+  }
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ENV.geminiModel}:generateContent?key=${encodeURIComponent(ENV.geminiApiKey)}`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ systemInstruction: { parts: [{ text: systemPrompt }] }, contents: [{ role: "user", parts }], generationConfig: { temperature: 0.2, responseMimeType: "application/json", responseSchema: geminiSchema } }),
+  });
+  const payload = await response.json() as { error?: { message?: string }; candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+  if (!response.ok) throw new Error(`Gemini API (${response.status}): ${payload.error?.message ?? "erro desconhecido"}`);
+  const jsonText = payload.candidates?.[0]?.content?.parts?.map(part => part.text ?? "").join("").trim();
+  if (!jsonText) throw new Error("O Gemini não retornou uma análise utilizável.");
+  return JSON.parse(jsonText);
+}
 
 export const appRouter = router({
   system: systemRouter,
@@ -103,24 +140,9 @@ export const appRouter = router({
     analyze: publicProcedure
       .input(correctionInputSchema)
       .mutation(async ({ input }) => {
-        const content = [
-          { type: "text" as const, text: `Faça a correção completa seguindo o protocolo. ${input.text?.trim() ? `Redação digitada:\n${input.text.trim()}` : "A redação foi enviada como imagem; transcreva-a antes da análise."}` },
-          ...(input.imageDataUrl ? [{ type: "image_url" as const, image_url: { url: input.imageDataUrl, detail: "high" as const } }] : []),
-        ];
-        const response = await invokeLLM({
-          model: "gemini-3-flash-preview",
-          messages: [{ role: "system", content: systemPrompt }, { role: "user", content }],
-          maxTokens: 12000,
-          responseFormat: { type: "json_schema", json_schema: correctionJsonSchema },
-        });
-        const choice = response?.choices?.[0];
-        if (!choice?.message) {
-          const providerError = response && "error" in response ? JSON.stringify(response.error) : "resposta sem escolhas válidas";
-          throw new Error(`A IA não retornou uma análise utilizável: ${providerError}`);
-        }
-        const raw = choice.message.content;
-        const jsonText = typeof raw === "string" ? raw : JSON.stringify(raw);
-        return correctionSchema.parse(JSON.parse(jsonText));
+        const prompt = `Faça a correção completa seguindo o protocolo. ${input.text?.trim() ? `Redação digitada:\n${input.text.trim()}` : "A redação foi enviada como imagem; transcreva-a antes da análise."}`;
+        const raw = await invokeGemini(prompt, input.imageDataUrl);
+        return correctionSchema.parse(raw);
       }),
   }),
 });

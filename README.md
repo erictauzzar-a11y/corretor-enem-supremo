@@ -32,7 +32,7 @@ pnpm test
 pnpm build
 ```
 
-As credenciais não devem ser colocadas no código-fonte. Use o painel de Secrets do projeto ou um arquivo `.env` local que não seja versionado. Consulte `.env.example` para saber quais categorias de configuração existem.
+As credenciais não devem ser colocadas no código-fonte. Use o painel de Secrets do projeto ou um arquivo `.env` local que não seja versionado. Consulte `docs/configuration.md` para saber quais categorias de configuração existem e como cadastrar o Gemini com segurança.
 
 ## Arquitetura rápida
 

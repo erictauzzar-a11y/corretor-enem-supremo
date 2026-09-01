@@ -44,3 +44,10 @@
 - [ ] Ampliar a explicação clicável das cinco competências com o que é avaliado, como pontuar melhor, erros comuns e exemplo prático
 - [ ] Validar a nova seção no preview e atualizar testes/build
 - [ ] Commitar e enviar todas as alterações para o GitHub público
+- [x] Integrar o Gemini por API no servidor sem expor a chave no cliente
+- [x] Configurar GEMINI_API_KEY e modelo por variáveis de ambiente
+- [x] Manter suporte a texto, imagem, resposta estruturada, parecer e PDF
+- [x] Atualizar documentação e exemplos seguros para outras IAs
+- [ ] Testar o fluxo com a API do Gemini e sincronizar todas as alterações no GitHub
+- [x] Atualizar o modelo padrão para gemini-3.6-flash conforme disponibilidade real da conta
+- [x] Repetir o teste real de generateContent e remover o diagnóstico temporário
