@@ -17,8 +17,9 @@
 - [x] Adicionar testes do endpoint correction.analyze para entrada e resposta inválidas
 - [x] Adicionar exemplo público seguro de configuração em documentação alternativa permitida
 - [ ] Criar checkpoint final após nova validação
-- [ ] Preparar o repositório para publicação pública no GitHub sem arquivos sensíveis
-- [ ] Criar ou localizar repositório público do Corretor ENEM Supremo
-- [ ] Enviar o código e configurar instruções de continuidade para outras IAs
-- [ ] Entregar o link público do GitHub ao usuário
-- [ ] Autorizar a integração GitHub nesta sessão para exportação pública do projeto
+- [x] Preparar o repositório para publicação pública no GitHub sem arquivos sensíveis
+- [x] Criar ou localizar repositório público do Corretor ENEM Supremo
+- [x] Enviar o código e configurar instruções de continuidade para outras IAs
+- [x] Entregar o link público do GitHub ao usuário
+- [x] Autorizar a integração GitHub nesta sessão para exportação pública do projeto
+- [ ] Adicionar no site uma área clicável com os critérios das cinco competências da redação do ENEM e a régua de notas
