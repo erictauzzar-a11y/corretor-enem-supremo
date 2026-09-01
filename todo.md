@@ -1,0 +1,24 @@
+
+- [x] Criar a interface principal do Corretor ENEM Supremo com identidade visual educacional e profissional
+- [x] Implementar entrada de redação por texto digitado
+- [x] Implementar seleção e pré-visualização de imagem manuscrita
+- [x] Implementar fluxo de correção pelas cinco competências e nota de 0 a 1000
+- [x] Implementar tela de resultado com detalhamento obrigatório e parecer pedagógico
+- [x] Adicionar estados de carregamento, erro, vazio e responsividade
+- [x] Escrever e executar testes Vitest para o fluxo principal
+- [x] Validar a interface no navegador e salvar checkpoint final
+- [x] Preparar README completo para execução, arquitetura, pontos de edição e instruções para outras IAs
+- [x] Adicionar licença MIT e política explícita para não versionar segredos
+- [x] Adicionar arquivo de contexto para agentes/IA com mapa de arquivos e regras de contribuição
+- [x] Garantir que configurações sensíveis usem variáveis de ambiente e exemplos públicos seguros
+- [x] Restringir as notas às faixas oficiais e validar que a nota final é a soma das cinco competências
+- [x] Expandir o resultado com os campos obrigatórios do protocolo por competência e checklist explícito da intervenção
+- [x] Adicionar feedback visual para arquivo inválido, entrada ausente e falhas de análise
+- [x] Adicionar testes do endpoint correction.analyze para entrada e resposta inválidas
+- [x] Adicionar exemplo público seguro de configuração em documentação alternativa permitida
+- [ ] Criar checkpoint final após nova validação
+- [ ] Preparar o repositório para publicação pública no GitHub sem arquivos sensíveis
+- [ ] Criar ou localizar repositório público do Corretor ENEM Supremo
+- [ ] Enviar o código e configurar instruções de continuidade para outras IAs
+- [ ] Entregar o link público do GitHub ao usuário
+- [ ] Autorizar a integração GitHub nesta sessão para exportação pública do projeto

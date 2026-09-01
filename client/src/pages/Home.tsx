@@ -1,33 +1,99 @@
-import { useAuth } from "@/_core/hooks/useAuth";
+import { useRef, useState } from "react";
+import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { Streamdown } from 'streamdown';
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { BookOpen, Check, ChevronRight, FileImage, FileText, GraduationCap, Lightbulb, Loader2, RotateCcw, Sparkles, Target, Upload, X } from "lucide-react";
 
-/**
- * All content in this page are only for example, replace with your own feature implementation
- * When building pages, remember your instructions in Frontend Workflow, Frontend Best Practices, Design Guide and Common Pitfalls
- */
+type Correction = {
+  finalScore: number;
+  transcription: string;
+  competencies: Array<{ score: number; title: string; summary: string; details: string[]; verdict: string; protocolFindings: Record<string, string> }>;
+  intervention: { agent: string; action: string; means: string; purpose: string; detail: string; viability: string; checklist: Record<string, string> };
+  pedagogicalReport: string;
+  warning: string;
+};
+
+const competencies = ["Norma culta", "Compreensão do tema", "Projeto de texto", "Coesão", "Intervenção"];
+
 export default function Home() {
-  // The useAuth hook provides authentication state.
-  // To implement login/logout, call logout(), or start login from an event
-  // handler: onClick={() => startLogin()} (imported from "@/const"). Never call
-  // startLogin() during render (no href={startLogin()}) — it mints a one-time
-  // nonce cookie and must run only at the moment of navigation.
-  let { user, loading, error, isAuthenticated, logout } = useAuth();
+  const [text, setText] = useState("");
+  const [imageDataUrl, setImageDataUrl] = useState<string>();
+  const [imageName, setImageName] = useState("");
+  const [result, setResult] = useState<Correction>();
+  const [mode, setMode] = useState<"text" | "image">("text");
+  const [uploadError, setUploadError] = useState("");
+  const fileRef = useRef<HTMLInputElement>(null);
+  const correction = trpc.correction.analyze.useMutation({ onSuccess: data => setResult(data as Correction) });
 
-  // If theme is switchable in App.tsx, we can implement theme toggling like this:
-  // const { theme, toggleTheme } = useTheme();
+  const handleFile = (file?: File) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/") || file.size > 8 * 1024 * 1024) {
+      setUploadError("Escolha uma imagem JPG ou PNG com até 8 MB.");
+      return;
+    }
+    setUploadError("");
+    const reader = new FileReader();
+    reader.onload = () => { setImageDataUrl(String(reader.result)); setImageName(file.name); };
+    reader.readAsDataURL(file);
+  };
+
+  const submit = () => {
+    if (mode === "text" && !text.trim()) { setUploadError("Digite ou cole sua redação antes de continuar."); return; }
+    if (mode === "image" && !imageDataUrl) { setUploadError("Selecione uma imagem da redação antes de continuar."); return; }
+    setUploadError("");
+    correction.mutate({ text: mode === "text" ? text : undefined, imageDataUrl: mode === "image" ? imageDataUrl : undefined });
+  };
+  const reset = () => { setResult(undefined); setText(""); setImageDataUrl(undefined); setImageName(""); correction.reset(); };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <main>
-        {/* Example: lucide-react for icons */}
-        <Loader2 className="animate-spin" />
-        Example Page
-        {/* Example: Streamdown for markdown rendering */}
-        <Streamdown>Any **markdown** content</Streamdown>
-        <Button variant="default">Example Button</Button>
+    <div className="min-h-screen bg-[#f7f8fc] text-[#17233d]">
+      <header className="border-b border-[#e8eaf2] bg-white/85 backdrop-blur sticky top-0 z-20">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
+          <div className="flex items-center gap-3">
+            <div className="brand-mark"><GraduationCap className="h-5 w-5" /></div>
+            <div><p className="text-[15px] font-bold tracking-tight">Corretor ENEM</p><p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#788199]">Supremo</p></div>
+          </div>
+          <div className="hidden items-center gap-6 text-sm font-medium text-[#788199] md:flex"><a href="#como-funciona" className="transition hover:text-[#3155d8]">Como funciona</a><a href="#criterios" className="transition hover:text-[#3155d8]">Critérios</a><Badge className="rounded-full bg-[#edf1ff] px-3 py-1 text-[#3155d8] hover:bg-[#edf1ff]">IA pedagógica</Badge></div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-7xl px-5 pb-20 pt-10 lg:px-8 lg:pt-16">
+        <section className="grid items-start gap-12 lg:grid-cols-[0.86fr_1.14fr] lg:gap-20">
+          <div className="pt-3">
+            <div className="eyebrow"><span className="eyebrow-dot" /> CORREÇÃO COM MÉTODO</div>
+            <h1 className="mt-5 max-w-xl text-4xl font-extrabold leading-[1.08] tracking-[-0.04em] text-[#17233d] sm:text-5xl lg:text-[4.2rem]">Sua redação, <span className="text-[#3155d8]">lapidada</span> para o ENEM.</h1>
+            <p className="mt-6 max-w-lg text-[17px] leading-8 text-[#66708a]">Receba uma análise precisa, acolhedora e completa, baseada nas cinco competências oficiais do ENEM.</p>
+            <div className="mt-9 grid max-w-lg grid-cols-2 gap-3 sm:grid-cols-3">
+              {[{ icon: Target, label: "5 competências" }, { icon: Sparkles, label: "Nota de 0 a 1000" }, { icon: Lightbulb, label: "Dicas práticas" }].map(({ icon: Icon, label }) => <div key={label} className="flex items-center gap-2 rounded-xl border border-[#e6e9f2] bg-white px-3 py-3 text-xs font-semibold text-[#4b5875] shadow-sm"><Icon className="h-4 w-4 text-[#3155d8]" />{label}</div>)}
+            </div>
+            <div className="mt-12 hidden items-center gap-3 border-t border-[#e4e7f0] pt-5 text-xs text-[#7b849a] sm:flex"><div className="flex -space-x-2"><span className="avatar bg-[#dfe8ff]">A</span><span className="avatar bg-[#ffe6d8]">M</span><span className="avatar bg-[#dff2e7]">L</span></div><span>Feito para quem quer evoluir<br /><strong className="font-semibold text-[#4c5871]">uma competência por vez.</strong></span></div>
+          </div>
+
+          <Card className="overflow-hidden rounded-[24px] border-0 bg-white shadow-[0_24px_70px_rgba(39,57,107,0.12)]">
+            <CardHeader className="border-b border-[#eef0f6] px-6 pb-5 pt-6 sm:px-8"><div className="flex items-start justify-between"><div><CardTitle className="text-xl font-bold tracking-tight">Comece sua correção</CardTitle><p className="mt-1.5 text-sm text-[#8891a6]">Escolha como deseja enviar sua redação.</p></div><div className="rounded-xl bg-[#f1f4ff] p-2.5 text-[#3155d8]"><BookOpen className="h-5 w-5" /></div></div></CardHeader>
+            <CardContent className="px-6 pb-7 pt-6 sm:px-8">
+              <div className="mb-5 grid grid-cols-2 gap-2 rounded-xl bg-[#f5f6fa] p-1.5"><button onClick={() => setMode("text")} className={`mode-tab ${mode === "text" ? "mode-tab-active" : ""}`}><FileText className="h-4 w-4" />Texto digitado</button><button onClick={() => setMode("image")} className={`mode-tab ${mode === "image" ? "mode-tab-active" : ""}`}><FileImage className="h-4 w-4" />Imagem</button></div>
+              {mode === "text" ? <div><Textarea value={text} onChange={e => setText(e.target.value)} placeholder="Cole ou digite sua redação aqui..." className="min-h-[250px] resize-none rounded-2xl border-[#e2e5ee] bg-[#fbfcfe] p-4 text-[15px] leading-7 shadow-none placeholder:text-[#a9b0c1] focus-visible:ring-[#bfcaff]" /><div className="mt-2 flex justify-between text-xs text-[#9aa2b4]"><span>Recomendado: entre 20 e 30 linhas</span><span>{text.length} caracteres</span></div></div> : <div className="relative flex min-h-[250px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#cfd7f5] bg-[#fafbff] px-6 text-center"><input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => handleFile(e.target.files?.[0])} />{imageDataUrl ? <><img src={imageDataUrl} alt="Pré-visualização da redação" className="max-h-44 rounded-lg object-contain shadow-sm" /><div className="mt-3 flex items-center gap-2 text-sm font-semibold text-[#45516d]"><FileImage className="h-4 w-4 text-[#3155d8]" />{imageName}<button onClick={() => { setImageDataUrl(undefined); setImageName(""); }} aria-label="Remover imagem"><X className="h-4 w-4 text-[#9aa2b4]" /></button></div></> : <><div className="mb-3 rounded-full bg-[#eaf0ff] p-3 text-[#3155d8]"><Upload className="h-5 w-5" /></div><p className="text-sm font-semibold text-[#46536e]">Envie uma foto da sua redação</p><p className="mt-1 text-xs text-[#9aa2b4]">JPG ou PNG, até 8 MB</p><Button onClick={() => fileRef.current?.click()} variant="outline" className="mt-4 rounded-xl border-[#dbe1f3] bg-white text-[#3155d8] hover:bg-[#f1f4ff]">Selecionar arquivo</Button></>}</div>}
+              {(uploadError || correction.error) && <Alert className="mt-4 border-[#ffd5d5] bg-[#fff7f7] text-[#b94242]"><AlertDescription>{uploadError || "Não foi possível concluir a correção. Verifique o envio e tente novamente."}</AlertDescription></Alert>}
+              <Button onClick={submit} disabled={correction.isPending || (mode === "text" ? !text.trim() : !imageDataUrl)} className="mt-6 h-12 w-full rounded-xl bg-[#3155d8] text-sm font-bold shadow-[0_8px_20px_rgba(49,85,216,0.22)] transition hover:bg-[#2546c3] active:scale-[0.98]">{correction.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Analisando sua redação...</> : <>Corrigir minha redação <ChevronRight className="ml-2 h-4 w-4" /></>}</Button>
+              <p className="mt-3 text-center text-[11px] text-[#9aa2b4]">Sua redação é usada apenas para gerar esta análise.</p>
+            </CardContent>
+          </Card>
+        </section>
+
+        {result && <section className="result-section mt-16" id="resultado"><div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><div className="eyebrow"><span className="eyebrow-dot" /> RESULTADO DA ANÁLISE</div><h2 className="mt-3 text-3xl font-extrabold tracking-tight">Seu diagnóstico completo</h2></div><Button onClick={reset} variant="outline" className="w-fit rounded-xl border-[#dfe4ef] bg-white"><RotateCcw className="mr-2 h-4 w-4" />Nova correção</Button></div>
+          <div className="grid gap-5 lg:grid-cols-[260px_1fr]"><Card className="score-card border-0 text-white"><CardContent className="flex h-full flex-col justify-between p-7"><div><p className="text-sm font-semibold text-white/70">NOTA FINAL</p><div className="mt-4 text-6xl font-extrabold tracking-[-0.06em]">{result.finalScore}<span className="ml-1 text-2xl font-semibold text-white/60">/1000</span></div></div><div className="mt-8 flex items-center gap-2 text-sm font-medium text-white/80"><Check className="h-4 w-4" />Análise concluída</div></CardContent></Card><Card className="border-[#e7eaf2] shadow-sm"><CardHeader className="pb-3"><CardTitle className="text-lg">Desempenho por competência</CardTitle></CardHeader><CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">{result.competencies.map((item, index) => <div key={item.title} className="rounded-xl bg-[#f7f8fc] p-4"><div className="flex items-center justify-between"><span className="text-xs font-bold text-[#3155d8]">C{index + 1}</span><span className="text-sm font-extrabold text-[#293653]">{item.score}<small className="font-medium text-[#9ba3b5">/200</small></span></div><p className="mt-3 text-xs font-semibold leading-5 text-[#5c6780]">{item.title}</p><div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#e1e5ef]"><div className="h-full rounded-full bg-[#3155d8]" style={{ width: `${item.score / 2}%` }} /></div></div>)}</CardContent></Card></div>
+          <div className="mt-5 grid gap-5 lg:grid-cols-2">{result.competencies.map((item, index) => <Card key={item.title} className="border-[#e7eaf2] shadow-sm"><CardHeader className="pb-3"><div className="flex items-center justify-between gap-3"><CardTitle className="text-base"><span className="mr-2 text-[#3155d8]">C{index + 1}</span>{item.title}</CardTitle><Badge variant="outline" className="border-[#dbe2f7] text-[#3155d8]">{item.score}/200</Badge></div></CardHeader><CardContent><p className="text-sm leading-6 text-[#66708a]">{item.summary}</p><div className="mt-4 space-y-2">{Object.entries(item.protocolFindings).map(([label, content]) => <div key={label} className="rounded-lg bg-[#f7f8fc] px-3 py-2.5"><p className="text-[10px] font-bold uppercase tracking-wide text-[#3155d8]">{{ grammar: "Desvios gramaticais e ortográficos", syntax: "Falhas de estrutura sintática", theme: "Adequação ao tema", textType: "Tipo textual", repertoire: "Repertório legítimo e produtivo", project: "Projeto de texto", coherence: "Coerência e argumentação", interparagraphCohesion: "Coesão interparágrafos", intraparagraphCohesion: "Coesão intraparágrafos", cohesionInadequacies: "Inadequações coesivas" }[label] || label}</p><p className="mt-1 text-sm leading-5 text-[#4e5a73]">{content}</p></div>)}</div><ul className="mt-3 space-y-2">{item.details.map(detail => <li key={detail} className="flex gap-2 text-sm leading-5 text-[#4e5a73]"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#7890e8]" />{detail}</li>)}</ul><p className="mt-4 border-t border-[#eef0f5] pt-3 text-sm font-medium leading-6 text-[#35425f]"><strong>Veredito: </strong>{item.verdict}</p></CardContent></Card>)}</div>
+          <Card className="mt-5 border-[#dce4ff] bg-[#f7f9ff] shadow-sm"><CardHeader><CardTitle className="text-lg">Proposta de intervenção</CardTitle></CardHeader><CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{Object.entries({ Agente: result.intervention.agent, Ação: result.intervention.action, "Meio / modo": result.intervention.means, Finalidade: result.intervention.purpose, Detalhamento: result.intervention.detail }).map(([key, value]) => <div key={key} className="rounded-xl bg-white p-4"><p className="text-xs font-bold uppercase tracking-wider text-[#3155d8]">{key}</p><p className="mt-2 text-sm leading-6 text-[#59657f]">{value}</p></div>)}<div className="sm:col-span-2 lg:col-span-3"><p className="text-sm leading-6 text-[#59657f]"><strong className="text-[#35425f]">Viabilidade: </strong>{result.intervention.viability}</p></div><div className="sm:col-span-2 lg:col-span-3 border-t border-[#dce4ff] pt-4"><p className="text-xs font-bold uppercase tracking-wider text-[#3155d8]">Checklist dos 5 elementos</p><div className="mt-3 grid gap-2 sm:grid-cols-5">{Object.entries(result.intervention.checklist).map(([key, value]) => <div key={key} className="rounded-lg bg-white p-3 text-xs leading-5 text-[#59657f]"><strong className="block text-[#35425f]">{key === "agent" ? "Agente" : key === "action" ? "Ação" : key === "means" ? "Meio / modo" : key === "purpose" ? "Finalidade" : "Detalhamento"}</strong>{value}</div>)}</div></div></CardContent></Card>
+          <Card className="mt-5 border-0 bg-[#17233d] text-white shadow-sm"><CardContent className="p-7"><div className="flex items-center gap-2 text-[#aebeff]"><Lightbulb className="h-5 w-5" /><span className="text-sm font-bold uppercase tracking-wider">Parecer pedagógico</span></div><p className="mt-4 max-w-4xl text-[15px] leading-8 text-white/80">{result.pedagogicalReport}</p>{result.warning && <p className="mt-4 text-sm text-[#ffd991]">Observação: {result.warning}</p>}</CardContent></Card>
+        </section>}
+
+        {!result && <section id="como-funciona" className="mt-24 border-t border-[#e5e8f0] pt-12"><div className="grid gap-8 md:grid-cols-3">{[{ n: "01", title: "Envie sua redação", text: "Cole o texto ou envie uma foto nítida da versão manuscrita." }, { n: "02", title: "Receba a análise", text: "Nosso corretor avalia cada competência com critérios claros." }, { n: "03", title: "Evolua na prática", text: "Use o diagnóstico para reescrever melhor e subir sua nota." }].map(item => <div key={item.n} className="flex gap-4"><span className="text-sm font-extrabold text-[#3155d8]">{item.n}</span><div><h3 className="font-bold">{item.title}</h3><p className="mt-2 text-sm leading-6 text-[#778198]">{item.text}</p></div></div>)}</div></section>}
       </main>
+      <footer className="border-t border-[#e5e8f0] bg-white"><div className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-6 text-xs text-[#8b94a7] sm:flex-row sm:items-center sm:justify-between lg:px-8"><span>Corretor ENEM Supremo · Ferramenta educacional</span><span>Correção orientativa baseada nas competências do ENEM.</span></div></footer>
     </div>
   );
 }
