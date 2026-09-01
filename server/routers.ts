@@ -1,8 +1,9 @@
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { ENV } from "./_core/env";
 import { z } from "zod";
+import { isSupabaseConfigured, listSupabaseCorrections, saveSupabaseCorrection } from "./supabase";
 
 const officialScore = z.union([z.literal(0), z.literal(40), z.literal(80), z.literal(120), z.literal(160), z.literal(200)]);
 
@@ -143,11 +144,29 @@ export const appRouter = router({
   correction: router({
     analyze: publicProcedure
       .input(correctionInputSchema)
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         const prompt = `Faça a correção completa seguindo o protocolo. ${input.text?.trim() ? `Redação digitada:\n${input.text.trim()}` : "A redação foi enviada como imagem; transcreva-a antes da análise."}`;
         const raw = await invokeGemini(prompt, input.imageDataUrl);
-        return correctionSchema.parse(raw);
+        const correction = correctionSchema.parse(raw);
+        let persisted = false;
+        if (ctx.user && isSupabaseConfigured()) {
+          try {
+            await saveSupabaseCorrection({
+              user: ctx.user,
+              originalText: input.text,
+              imageSubmitted: Boolean(input.imageDataUrl),
+              transcription: correction.transcription,
+              finalScore: correction.finalScore,
+              result: correction,
+            });
+            persisted = true;
+          } catch (error) {
+            console.error("Falha ao salvar correção no Supabase:", error);
+          }
+        }
+        return { ...correction, persisted };
       }),
+    history: protectedProcedure.query(async ({ ctx }) => listSupabaseCorrections(ctx.user)),
   }),
 });
 

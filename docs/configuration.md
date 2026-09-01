@@ -11,5 +11,7 @@ O projeto depende de variáveis fornecidas pelo ambiente de execução. Para des
 | `VITE_APP_TITLE` | Nome público da aplicação | Cliente |
 | `GEMINI_API_KEY` | Chave da API Gemini para correção de texto e imagem | Apenas servidor |
 | `GEMINI_MODEL` | Modelo Gemini usado pelo backend; padrão atual: `gemini-3.6-flash` | Apenas servidor |
+| `SUPABASE_URL` | URL base do projeto Supabase usada pelo backend REST | Apenas servidor |
+| `SUPABASE_SERVICE_ROLE_KEY` | Chave secreta para persistir usuários e correções; nunca exponha no cliente | Apenas servidor |
 
 Ao pedir que outra IA edite o projeto, compartilhe este arquivo, o README e o AGENTS.md, mas nunca compartilhe os valores das variáveis. Para usar o Gemini, cadastre `GEMINI_API_KEY` no painel de Secrets e, opcionalmente, altere `GEMINI_MODEL`. A chave é lida somente pelo servidor e não deve aparecer no cliente, em commits ou no GitHub. Para testar a interface sem uma chamada real, altere o backend em uma branch local e escreva testes de contrato; não adicione chaves falsas ao repositório.

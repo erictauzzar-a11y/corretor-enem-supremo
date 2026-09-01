@@ -55,3 +55,10 @@
 - [x] Validar o envio por imagem e a geração do PDF após a troca para Gemini
 - [x] Confirmar no GitHub a publicação de todos os arquivos relevantes da integração — verificados na branch main
 - [x] Adicionar tentativas automáticas para erros temporários 429/500/503 do Gemini
+- [x] Auditar o banco atual, o fluxo de login Manus OAuth e a estratégia de persistência
+- [x] Configurar credenciais do Supabase exclusivamente por secrets do servidor
+- [x] Modelar tabelas Supabase para usuários, redações e correções com vínculos e timestamps
+- [x] Aplicar migração segura e verificar conexão com o Supabase
+- [x] Persistir correções autenticadas sem bloquear o fluxo atual de análise
+- [x] Adicionar testes Vitest para conexão, persistência e isolamento por usuário
+- [x] Atualizar documentação de configuração do Supabase e sincronizar no GitHub
