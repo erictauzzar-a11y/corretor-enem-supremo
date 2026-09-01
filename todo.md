@@ -62,3 +62,9 @@
 - [x] Persistir correções autenticadas sem bloquear o fluxo atual de análise
 - [x] Adicionar testes Vitest para conexão, persistência e isolamento por usuário
 - [x] Atualizar documentação de configuração do Supabase e sincronizar no GitHub — branch main confirmada no SHA 3d569f26
+- [x] Diagnosticar a variação de notas para a mesma redação e registrar casos de teste de consistência — três chamadas reais retornaram 520, com competências 160/80/80/80/120
+- [x] Tornar a geração do Gemini mais determinística e reforçar o protocolo de evidências por competência
+- [x] Adicionar validações server-side para impedir nota sem justificativa textual e revisar a soma das competências
+- [x] Testar repetidamente a mesma redação em texto, atualizar documentação e sincronizar a correção no GitHub
+- [ ] Repetir três chamadas reais com a mesma imagem de redação quando uma imagem de teste for fornecida
+- [x] Validar o fluxo multimodal anteriormente — consistência específica por imagem permanece condicionada à disponibilidade de uma imagem de teste

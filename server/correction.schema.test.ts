@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { appRouter, correctionInputSchema, correctionSchema } from "./routers";
 
-const competency = (score: number) => ({ score, title: "Competência", summary: "Resumo", details: ["Observação"], verdict: "Veredito", protocolFindings: { grammar: "Identificado — análise", syntax: "Identificado — análise", theme: "Identificado — análise", textType: "Identificado — análise", repertoire: "Identificado — análise", project: "Identificado — análise", coherence: "Identificado — análise", interparagraphCohesion: "Identificado — análise", intraparagraphCohesion: "Identificado — análise", cohesionInadequacies: "Não identificado — sem ocorrência" } });
+const competency = (score: number) => ({ score, title: "Competência", summary: "Resumo", details: ["Observação"], evidence: ["Trecho observável da redação"], verdict: "Veredito", protocolFindings: { grammar: "Identificado — análise", syntax: "Identificado — análise", theme: "Identificado — análise", textType: "Identificado — análise", repertoire: "Identificado — análise", project: "Identificado — análise", coherence: "Identificado — análise", interparagraphCohesion: "Identificado — análise", intraparagraphCohesion: "Identificado — análise", cohesionInadequacies: "Não identificado — sem ocorrência" } });
 
 const validCorrection = {
   finalScore: 800,
@@ -21,6 +21,10 @@ describe("correctionSchema", () => {
     expect(() => correctionInputSchema.parse({})).toThrow();
     const caller = appRouter.createCaller({} as never);
     await expect(caller.correction.analyze({})).rejects.toThrow();
+  });
+
+  it("rejeita uma nota final que não corresponde à soma das competências", () => {
+    expect(() => correctionSchema.parse({ ...validCorrection, finalScore: 760 })).toThrow("A nota final deve ser a soma das cinco competências.");
   });
 
   it("rejeita uma correção com seis competências", () => {

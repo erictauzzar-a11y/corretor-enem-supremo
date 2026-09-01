@@ -11,7 +11,8 @@ export const competencySchema = z.object({
   score: officialScore,
   title: z.string(),
   summary: z.string(),
-  details: z.array(z.string()),
+  details: z.array(z.string()).min(1),
+  evidence: z.array(z.string().min(8)).min(1).max(5),
   verdict: z.string(),
   protocolFindings: z.object({ grammar: z.string(), syntax: z.string(), theme: z.string(), textType: z.string(), repertoire: z.string(), project: z.string(), coherence: z.string(), interparagraphCohesion: z.string(), intraparagraphCohesion: z.string(), cohesionInadequacies: z.string() }),
 });
@@ -53,7 +54,7 @@ export const correctionJsonSchema = {
         items: {
           type: "object",
           additionalProperties: false,
-          required: ["score", "title", "summary", "details", "verdict", "protocolFindings"],
+          required: ["score", "title", "summary", "details", "evidence", "verdict", "protocolFindings"],
           properties: {
             score: { type: "integer", minimum: 0, maximum: 200, multipleOf: 40 },
             title: { type: "string" },
@@ -88,18 +89,21 @@ export const correctionInputSchema = z.object({
   imageDataUrl: z.string().max(12000000).optional(),
 }).refine(input => Boolean(input.text?.trim() || input.imageDataUrl), { message: "Envie o texto ou uma imagem da redação." });
 
-const systemPrompt = `Você é o Corretor ENEM Supremo, especialista na matriz oficial do ENEM. Corrija a redação com rigor, precisão e acolhimento pedagógico. A nota de cada competência só pode ser 0, 40, 80, 120, 160 ou 200; a nota final é a soma. Analise norma culta, tema, tipo dissertativo-argumentativo, repertório legítimo e produtivo, projeto de texto, coerência, coesão e proposta de intervenção. Para a Competência 5, avalie agente, ação, meio/modo, finalidade/efeito e detalhamento. Nunca invente erros: cite apenas problemas observáveis. Em protocolFindings, use exatamente as chaves técnicas do contrato e escreva os valores em português claro. Na intervenção, cada campo deve começar por "Identificado —" ou "Não identificado —", com a explicação correspondente. Se a imagem estiver ilegível, indique isso em warning. Responda exclusivamente no JSON solicitado, em português do Brasil.`;
+const systemPrompt = `Você é um avaliador oficial do ENEM, não um gerador de opiniões. Corrija a redação inteira antes de pontuar e faça uma revisão silenciosa da própria análise antes de responder. Use exclusivamente o texto enviado como evidência; nunca invente erro, repertório ou informação ausente. A nota de cada competência só pode ser 0, 40, 80, 120, 160 ou 200 e deve corresponder ao nível efetivamente demonstrado: 0 = anulada/sem atendimento; 40 = atendimento muito insuficiente; 80 = insuficiente; 120 = mediano; 160 = bom; 200 = excelente. Para cada competência, forneça de 1 a 5 evidências observáveis, citando palavras, trechos curtos ou características concretas do texto; se não houver evidência, escreva explicitamente que não foi identificada. A justificativa, as evidências, o veredito e a nota precisam ser coerentes entre si. Reavalie especialmente descontos: não reduza nota por preferência estilística, não confunda ausência de repertório com erro gramatical e não conte o mesmo problema várias vezes. Analise norma culta, tema, tipo dissertativo-argumentativo, repertório legítimo e produtivo, projeto de texto, coerência, coesão e proposta de intervenção. Para a Competência 5, avalie agente, ação, meio/modo, finalidade/efeito e detalhamento. Em protocolFindings, use exatamente as chaves técnicas do contrato e escreva os valores em português claro. Na intervenção, cada campo deve começar por "Identificado —" ou "Não identificado —", com a explicação correspondente. Se a imagem estiver ilegível, indique isso em warning. Responda exclusivamente no JSON solicitado, em português do Brasil.`;
+
+export const GEMINI_GENERATION_CONFIG = { temperature: 0, topP: 0.1, seed: 17, candidateCount: 1, responseMimeType: "application/json", responseSchema: undefined as unknown,
+} as const;
 
 const geminiSchema = {
   type: "OBJECT",
   properties: {
     finalScore: { type: "INTEGER" }, transcription: { type: "STRING" },
     competencies: { type: "ARRAY", items: { type: "OBJECT", properties: {
-      score: { type: "INTEGER" }, title: { type: "STRING" }, summary: { type: "STRING" }, details: { type: "ARRAY", items: { type: "STRING" } }, verdict: { type: "STRING" },
+      score: { type: "INTEGER" }, title: { type: "STRING" }, summary: { type: "STRING" }, details: { type: "ARRAY", minItems: 1, items: { type: "STRING" } }, evidence: { type: "ARRAY", minItems: 1, maxItems: 5, items: { type: "STRING", minLength: 8 } }, verdict: { type: "STRING" },
       protocolFindings: { type: "OBJECT", properties: {
         grammar: { type: "STRING" }, syntax: { type: "STRING" }, theme: { type: "STRING" }, textType: { type: "STRING" }, repertoire: { type: "STRING" }, project: { type: "STRING" }, coherence: { type: "STRING" }, interparagraphCohesion: { type: "STRING" }, intraparagraphCohesion: { type: "STRING" }, cohesionInadequacies: { type: "STRING" }
       }, required: ["grammar", "syntax", "theme", "textType", "repertoire", "project", "coherence", "interparagraphCohesion", "intraparagraphCohesion", "cohesionInadequacies"] }
-    }, required: ["score", "title", "summary", "details", "verdict", "protocolFindings"] } },
+    }, required: ["score", "title", "summary", "details", "evidence", "verdict", "protocolFindings"] } },
     intervention: { type: "OBJECT", properties: {
       agent: { type: "STRING" }, action: { type: "STRING" }, means: { type: "STRING" }, purpose: { type: "STRING" }, detail: { type: "STRING" }, viability: { type: "STRING" },
       checklist: { type: "OBJECT", properties: { agent: { type: "STRING" }, action: { type: "STRING" }, means: { type: "STRING" }, purpose: { type: "STRING" }, detail: { type: "STRING" } }, required: ["agent", "action", "means", "purpose", "detail"] }
@@ -116,7 +120,7 @@ async function invokeGemini(text: string, imageDataUrl?: string) {
     if (!match) throw new Error("Imagem inválida: envie JPG ou PNG em formato válido.");
     parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
   }
-  const requestBody = JSON.stringify({ systemInstruction: { parts: [{ text: systemPrompt }] }, contents: [{ role: "user", parts }], generationConfig: { temperature: 0.2, responseMimeType: "application/json", responseSchema: geminiSchema } });
+  const requestBody = JSON.stringify({ systemInstruction: { parts: [{ text: systemPrompt }] }, contents: [{ role: "user", parts }], generationConfig: { ...GEMINI_GENERATION_CONFIG, responseSchema: geminiSchema } });
   let response: Response;
   let payload = {} as { error?: { message?: string }; candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
   for (let attempt = 0; attempt < 3; attempt += 1) {
