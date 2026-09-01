@@ -16,10 +16,25 @@
 - [x] Adicionar feedback visual para arquivo inválido, entrada ausente e falhas de análise
 - [x] Adicionar testes do endpoint correction.analyze para entrada e resposta inválidas
 - [x] Adicionar exemplo público seguro de configuração em documentação alternativa permitida
-- [ ] Criar checkpoint final após nova validação
+- [x] Criar checkpoint final após nova validação
 - [x] Preparar o repositório para publicação pública no GitHub sem arquivos sensíveis
 - [x] Criar ou localizar repositório público do Corretor ENEM Supremo
 - [x] Enviar o código e configurar instruções de continuidade para outras IAs
 - [x] Entregar o link público do GitHub ao usuário
 - [x] Autorizar a integração GitHub nesta sessão para exportação pública do projeto
-- [ ] Adicionar no site uma área clicável com os critérios das cinco competências da redação do ENEM e a régua de notas
+- [x] Adicionar no site uma área clicável com os critérios das cinco competências da redação do ENEM e a régua de notas
+- [x] Diagnosticar erro ao enviar redação e confirmar disponibilidade da integração interna de IA
+- [x] Corrigir tratamento de erro e garantir resposta válida da análise
+- [x] Testar o fluxo completo de correção com uma redação digitada
+- [x] Adicionar botão para baixar a correção completa em PDF com parecer pedagógico, competências e intervenção
+- [x] Validar a geração do PDF com resultado preenchido
+- [x] Traduzir as chaves internas dos achados e do checklist para rótulos claros em português no PDF
+- [x] Validar o PDF corrigido com texto completo e confirmar que não há campos técnicos expostos
+- [x] Gerar um novo PDF após a correção dos rótulos e inspecionar o arquivo para confirmar que não há chaves técnicas
+- [x] Validar no preview que o PDF corrigido mostra apenas rótulos amigáveis em português
+- [ ] Renovar a autenticação do GitHub CLI para sincronizar as alterações recentes
+- [ ] Criar commit público com a correção do PDF e enviar para a branch main
+- [ ] Verificar no GitHub se a versão mais recente foi publicada
+- [ ] Renovar a autorização do GitHub CLI para sincronizar a versão mais recente
+- [ ] Commitar e enviar a correção de PDF para a branch main pública
+- [ ] Confirmar que todos os arquivos recentes estão no GitHub

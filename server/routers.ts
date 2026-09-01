@@ -35,7 +35,7 @@ export const correctionSchema = z.object({
   if (sum !== value.finalScore) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["finalScore"], message: "A nota final deve ser a soma das cinco competências." });
 });
 
-const correctionJsonSchema = {
+export const correctionJsonSchema = {
   name: "enem_correction",
   strict: true,
   schema: {
@@ -54,7 +54,7 @@ const correctionJsonSchema = {
           additionalProperties: false,
           required: ["score", "title", "summary", "details", "verdict", "protocolFindings"],
           properties: {
-            score: { type: "integer", enum: [0, 40, 80, 120, 160, 200] },
+            score: { type: "integer", minimum: 0, maximum: 200, multipleOf: 40 },
             title: { type: "string" },
             summary: { type: "string" },
             details: { type: "array", items: { type: "string" } },
@@ -113,7 +113,12 @@ export const appRouter = router({
           maxTokens: 12000,
           responseFormat: { type: "json_schema", json_schema: correctionJsonSchema },
         });
-        const raw = response.choices[0]?.message?.content;
+        const choice = response?.choices?.[0];
+        if (!choice?.message) {
+          const providerError = response && "error" in response ? JSON.stringify(response.error) : "resposta sem escolhas válidas";
+          throw new Error(`A IA não retornou uma análise utilizável: ${providerError}`);
+        }
+        const raw = choice.message.content;
         const jsonText = typeof raw === "string" ? raw : JSON.stringify(raw);
         return correctionSchema.parse(JSON.parse(jsonText));
       }),
