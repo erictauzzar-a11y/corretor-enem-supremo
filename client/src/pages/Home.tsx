@@ -71,6 +71,15 @@ export default function Home() {
     if (!supabase) return;
     void supabase.auth.getUser().then(({ data }) => setAuthUser(data.user));
   }, []);
+  useEffect(() => {
+    const checkoutState = new URLSearchParams(window.location.search).get("checkout");
+    if (checkoutState === "success") {
+      setUploadError("Pagamento recebido. Seu plano será ativado após a confirmação do Stripe.");
+      void billingQuery.refetch();
+    } else if (checkoutState === "cancelled") {
+      setUploadError("O checkout foi cancelado. Você pode tentar novamente quando quiser.");
+    }
+  }, [billingQuery.refetch]);
 
   const handleFile = (file?: File) => {
     if (!file) return;
@@ -139,7 +148,7 @@ export default function Home() {
         </section>
 
         <section id="plano" className="mt-14 grid gap-5 lg:grid-cols-[1fr_1.1fr]">
-          <Card className="border-[#dfe5ff] bg-[#f7f9ff] shadow-sm"><CardContent className="p-6 sm:p-8"><div className="flex items-center gap-2 text-[#3155d8]"><Crown className="h-5 w-5" /><span className="text-xs font-bold uppercase tracking-[0.18em]">Plano Supremo</span></div><h2 className="mt-3 text-2xl font-extrabold tracking-tight text-[#17233d]">Correções ilimitadas por R$ 37 ao ano</h2><p className="mt-3 max-w-xl text-sm leading-6 text-[#66708a]">Faça quantas correções precisar, por texto ou imagem, com histórico, PDF e análise pedagógica completa.</p><Button onClick={buyPlan} disabled={checkout.isPending} className="mt-6 rounded-xl bg-[#3155d8] font-bold text-white hover:bg-[#2546c3]">{checkout.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Crown className="mr-2 h-4 w-4" />}Ativar plano anual</Button><p className="mt-3 text-xs text-[#7d88a0]">Checkout seguro processado pelo Stripe. Renovação automática anual.</p></CardContent></Card>
+          <Card className="border-[#dfe5ff] bg-[#f7f9ff] shadow-sm"><CardContent className="p-6 sm:p-8"><div className="flex items-center gap-2 text-[#3155d8]"><Crown className="h-5 w-5" /><span className="text-xs font-bold uppercase tracking-[0.18em]">Plano Supremo</span></div><h2 className="mt-3 text-2xl font-extrabold tracking-tight text-[#17233d]">{billingQuery.data?.paid ? "Seu plano Supremo está ativo" : "Correções ilimitadas por R$ 37 ao ano"}</h2><p className="mt-3 max-w-xl text-sm leading-6 text-[#66708a]">Faça quantas correções precisar, por texto ou imagem, com histórico, PDF e análise pedagógica completa.</p><Button onClick={buyPlan} disabled={checkout.isPending || billingQuery.data?.paid} className="mt-6 rounded-xl bg-[#3155d8] font-bold text-white hover:bg-[#2546c3]">{checkout.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : billingQuery.data?.paid ? <ShieldCheck className="mr-2 h-4 w-4" /> : <Crown className="mr-2 h-4 w-4" />}{billingQuery.data?.paid ? "Plano ativo" : "Ativar plano anual"}</Button><p className="mt-3 text-xs text-[#7d88a0]">Checkout seguro processado pelo Stripe. Renovação automática anual.</p></CardContent></Card>
           <Card className="border-[#e7eaf2] bg-white shadow-sm"><CardContent className="grid gap-4 p-6 sm:grid-cols-2 sm:p-8"><div><div className="flex items-center gap-2 text-[#3155d8]"><LockKeyhole className="h-4 w-4" /><span className="text-xs font-bold uppercase tracking-wider">Grátis</span></div><p className="mt-2 text-sm leading-6 text-[#66708a]">1 correção por texto após criar sua conta.</p></div><div><div className="flex items-center gap-2 text-[#24734a]"><ShieldCheck className="h-4 w-4" /><span className="text-xs font-bold uppercase tracking-wider">Supremo</span></div><p className="mt-2 text-sm leading-6 text-[#66708a]">Texto, imagem, PDF, histórico e análise pedagógica ilimitados.</p></div></CardContent></Card>
         </section>
 
