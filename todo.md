@@ -37,3 +37,9 @@
 - [ ] Validar correção, histórico por conta e geração de PDF no preview
 
 - [x] Atualizar o modelo Gemini indisponível para o modelo recomendado pelo gateway
+
+- [ ] Corrigir o redirect_uri_mismatch reproduzido no login Google do preview
+
+- [x] Melhorar o design e a hierarquia visual do relatório PDF
+- [x] Adicionar resumo visual, paginação e seções de estudo ao PDF
+- [ ] Validar o PDF aprimorado no preview e no arquivo gerado

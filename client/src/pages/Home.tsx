@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { BookOpen, Check, ChevronRight, Clock3, Download, FileImage, FileText, GraduationCap, Lightbulb, Loader2, RotateCcw, Sparkles, Target, Upload, X } from "lucide-react";
-import { jsPDF } from "jspdf";
+import { downloadCorrectionPdf } from "@/lib/pdf";
 
 type HistoryItem = {
   id: string;
@@ -73,60 +73,7 @@ export default function Home() {
   const reset = () => { setResult(undefined); setText(""); setImageDataUrl(undefined); setImageName(""); correction.reset(); };
 
   const downloadPdf = () => {
-    if (!result) return;
-    const doc = new jsPDF({ unit: "pt", format: "a4" });
-    const margin = 42;
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const contentWidth = pageWidth - margin * 2;
-    let y = 52;
-    const navy = "#17233d";
-    const blue = "#3155d8";
-    const gray = "#5f6b84";
-    const protocolLabels: Record<string, string> = { grammar: "Desvios gramaticais e ortográficos", syntax: "Falhas de estrutura sintática", theme: "Adequação ao tema", textType: "Tipo textual", repertoire: "Repertório legítimo e produtivo", project: "Projeto de texto", coherence: "Coerência e argumentação", interparagraphCohesion: "Coesão interparágrafos", intraparagraphCohesion: "Coesão intraparágrafos", cohesionInadequacies: "Inadequações coesivas" };
-    const checklistLabels: Record<string, string> = { agent: "Agente", action: "Ação", means: "Meio / modo", purpose: "Finalidade", detail: "Detalhamento" };
-    const ensureSpace = (height: number) => { if (y + height > pageHeight - 44) { doc.addPage(); y = 48; } };
-    const textBlock = (value: string, size = 10, color = gray, gap = 8, bold = false) => {
-      doc.setFont("helvetica", bold ? "bold" : "normal");
-      doc.setFontSize(size);
-      doc.setTextColor(color);
-      const lines = doc.splitTextToSize(value || "—", contentWidth);
-      ensureSpace(lines.length * (size + 4) + gap);
-      doc.text(lines, margin, y);
-      y += lines.length * (size + 4) + gap;
-    };
-    const heading = (value: string, size = 15) => { ensureSpace(32); doc.setFont("helvetica", "bold"); doc.setFontSize(size); doc.setTextColor(navy); doc.text(value, margin, y); y += size + 9; };
-    const label = (value: string) => { ensureSpace(20); doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(blue); doc.text(value.toUpperCase(), margin, y); y += 13; };
-
-    doc.setFillColor(49, 85, 216); doc.roundedRect(margin, y - 20, contentWidth, 68, 10, 10, "F");
-    doc.setFont("helvetica", "bold"); doc.setFontSize(20); doc.setTextColor("#ffffff"); doc.text("Corretor ENEM Supremo", margin + 18, y + 7);
-    doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.text("Relatório completo de correção · " + new Date().toLocaleDateString("pt-BR"), margin + 18, y + 26);
-    y += 75;
-    doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(gray); doc.text("NOTA FINAL", margin, y); y += 25;
-    doc.setFontSize(31); doc.setTextColor(blue); doc.text(`${result.finalScore}/1000`, margin, y); y += 36;
-
-    heading("Texto analisado");
-    textBlock(result.transcription, 10, gray, 14);
-    heading("Desempenho por competência");
-    result.competencies.forEach((item, index) => {
-      ensureSpace(70);
-      label(`Competência ${index + 1} · ${item.score}/200`);
-      textBlock(item.title, 11, navy, 5, true);
-      textBlock(item.summary, 10, gray, 5);
-      Object.entries(item.protocolFindings).forEach(([key, value]) => textBlock(`${protocolLabels[key] ?? key}: ${value}`, 9, gray, 3));
-       item.details.forEach(detail => textBlock(`• ${detail}`, 9, gray, 3));
-       item.evidence.forEach(evidence => textBlock(`Evidência: ${evidence}`, 9, navy, 3));
-       textBlock(`Veredito: ${item.verdict}`, 9, navy, 12, true);
-    });
-    heading("Proposta de intervenção");
-    [["Agente", result.intervention.agent], ["Ação", result.intervention.action], ["Meio / modo", result.intervention.means], ["Finalidade", result.intervention.purpose], ["Detalhamento", result.intervention.detail], ["Viabilidade", result.intervention.viability]].forEach(([key, value]) => textBlock(`${key}: ${value}`, 10, gray, 4, true));
-    label("Checklist dos cinco elementos");
-    Object.entries(result.intervention.checklist).forEach(([key, value]) => textBlock(`${checklistLabels[key] ?? key}: ${value}`, 9, gray, 3));
-    heading("Parecer pedagógico");
-    textBlock(result.pedagogicalReport, 11, navy, 10);
-    if (result.warning) textBlock(`Observação: ${result.warning}`, 10, "#9a6700", 8, true);
-    doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor("#8b94a7"); doc.text("Correção orientativa baseada nas competências oficiais da redação do ENEM.", margin, pageHeight - 24);
-    doc.save(`correcao-enem-${result.finalScore}.pdf`);
+    if (result) downloadCorrectionPdf(result);
   };
 
   return (
