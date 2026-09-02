@@ -28,3 +28,6 @@
 - [ ] Confirmar que nenhuma chave privada aparece no navegador, bundle ou repositório
 - [x] Inspecionar o bundle público para garantir que secrets privados não foram incorporados
 - [ ] Comparar e validar os fluxos principais entre fonte e produção
+
+- [x] Manter o projeto em modo de desenvolvimento com preview acessível por link
+- [x] Não publicar a versão definitiva enquanto a fase de testes não terminar
