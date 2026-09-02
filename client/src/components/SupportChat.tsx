@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { BookOpenCheck, Loader2, Send, X } from "lucide-react";
 import { Streamdown } from "streamdown";
 import { Button } from "@/components/ui/button";
@@ -14,13 +14,17 @@ const welcome: ChatMessage = {
 };
 
 const suggestedQuestions = ["Por que minha nota foi essa?", "O que falta para eu chegar aos 1000?", "Como posso melhorar minha competência mais fraca?"];
+const tutorScope = /redação|redacao|texto|tema|tese|argumento|argumentação|argumentacao|repertório|repertorio|competência|competencia|nota|pontuação|pontuacao|1000|gramática|gramatica|ortografia|coesão|coesao|coerência|coerencia|intervenção|intervencao|agente|ação|acao|meio|finalidade|detalhamento|parágrafo|paragrafo|introdução|introducao|conclusão|conclusao|ENEM/i;
+const outOfScopeAnswer = "Sou o Tutor de Redação do AprovAI. Posso responder apenas sobre redação do ENEM, sua nota, suas competências, sua proposta de intervenção e os pontos indicados na sua correção.";
 
 export default function SupportChat({ correction }: { correction?: TutorCorrection | null }) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([welcome]);
+  const sendingRef = useRef(false);
   const tutor = trpc.support.ask.useMutation({
-    onSuccess: data => setMessages(current => [...current, { role: "assistant", content: data.answer }]),
+    onSuccess: data => { sendingRef.current = false; setMessages(current => [...current, { role: "assistant", content: data.answer }]); },
+    onError: () => { sendingRef.current = false; setMessages(current => [...current, { role: "assistant", content: "O Tutor está disponível nesta interface, mas as respostas por IA dependem do backend full-stack. O GitHub Pages hospeda apenas a tela estática; publique o backend para ativar a conversa com o Gemini." }]); },
   });
 
   const correctionContext = correction ? JSON.stringify({
@@ -33,10 +37,16 @@ export default function SupportChat({ correction }: { correction?: TutorCorrecti
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
     const message = input.trim();
-    if (!message || tutor.isPending) return;
+    if (!message || tutor.isPending || sendingRef.current) return;
+    sendingRef.current = true;
     const next = [...messages, { role: "user" as const, content: message }];
     setMessages(next);
     setInput("");
+    if (!tutorScope.test(message)) {
+      sendingRef.current = false;
+      setMessages(current => [...current, { role: "assistant", content: outOfScopeAnswer }]);
+      return;
+    }
     tutor.mutate({ message, history: next.slice(-8), correctionContext });
   };
 
@@ -57,9 +67,9 @@ export default function SupportChat({ correction }: { correction?: TutorCorrecti
           {messages.length === 1 && <div className="flex flex-wrap gap-2">{suggestedQuestions.map(question => <button key={question} onClick={() => askSuggested(question)} className="rounded-full border border-[#dbe3fa] bg-white px-3 py-2 text-left text-xs font-semibold text-[#3155d8] transition hover:bg-[#eef2ff]">{question}</button>)}</div>}
           {messages.map((item, index) => <div key={`${item.role}-${index}`} className={`flex ${item.role === "user" ? "justify-end" : "justify-start"}`}><div className={`max-w-[88%] rounded-2xl px-3.5 py-2.5 text-sm leading-6 ${item.role === "user" ? "rounded-br-md bg-[#3155d8] text-white" : "rounded-bl-md border border-[#e4e8f2] bg-white text-[#4d5972]"}`}>{item.role === "assistant" ? <Streamdown>{item.content}</Streamdown> : item.content}</div></div>)}
           {tutor.isPending && <div className="flex items-center gap-2 text-xs text-[#78839b]"><Loader2 className="h-3.5 w-3.5 animate-spin text-[#3155d8]" />Analisando sua dúvida...</div>}
-          {tutor.error && <p className="rounded-xl bg-[#fff5f5] px-3 py-2 text-xs text-[#b94242]">Não consegui responder agora. Aguarde alguns segundos e tente novamente.</p>}
+
         </div>
-        <form onSubmit={submit} className="flex gap-2 border-t border-[#edf0f6] bg-white p-3"><Input id="tutor-input" value={input} onChange={event => setInput(event.target.value)} placeholder="Pergunte sobre sua redação..." maxLength={2000} className="h-10 rounded-xl border-[#dfe4ef] text-sm" aria-label="Pergunta para o Tutor de Redação" /><Button type="submit" disabled={!input.trim() || tutor.isPending} size="icon" className="h-10 w-10 shrink-0 rounded-xl bg-[#3155d8] hover:bg-[#2546c3]" aria-label="Enviar pergunta ao Tutor"><Send className="h-4 w-4" /></Button></form>
+        <form onSubmit={submit} className="flex gap-2 border-t border-[#edf0f6] bg-white p-3"><Input id="tutor-input" value={input} onChange={event => setInput(event.target.value)} placeholder="Pergunte sobre sua redação..." maxLength={2000} className="h-10 rounded-xl border-[#dfe4ef] text-sm" aria-label="Pergunta para o Tutor de Redação" /><Button type="submit" disabled={!input.trim() || tutor.isPending || sendingRef.current} size="icon" className="h-10 w-10 shrink-0 rounded-xl bg-[#3155d8] hover:bg-[#2546c3]" aria-label="Enviar pergunta ao Tutor"><Send className="h-4 w-4" /></Button></form>
       </div>}
       <Button onClick={() => setOpen(value => !value)} className="h-12 gap-2 rounded-full bg-[#3155d8] px-5 font-semibold shadow-[0_10px_26px_rgba(49,85,216,0.28)] hover:bg-[#2546c3]" aria-expanded={open}><BookOpenCheck className="h-4 w-4" />Tutor de Redação</Button>
     </div>
