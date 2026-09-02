@@ -7,18 +7,18 @@
 - [x] Configurar secrets de produção do Supabase sem expor a service role no navegador
 - [x] Manter cadastro e login por e-mail e senha com Supabase Auth
 - [x] Manter recuperação de senha e sessão persistente
-- [ ] Completar login com Google via Supabase Auth
+- [x] Completar login com Google via Supabase Auth
 - [ ] Atualizar URLs de redirecionamento para o domínio permanente
   - O callback Supabase está configurado; o domínio final só existe após publicação
 - [x] Criar ou migrar o modelo de histórico de correções por usuário
 - [x] Garantir isolamento do histórico por conta autenticada
 - [x] Validar typecheck, testes e build de produção
-- [ ] Validar autenticação e persistência no preview de produção
-  - Requer teste com uma conta real após o primeiro publish
+- [x] Validar autenticação e persistência no preview de produção
+  - Conta real `eric.tauzz.arck@gmail.com` validada no preview estável em 02/09/2026; o teste do domínio publicado permanece pendente
 - [x] Validar correção por texto e imagem com Gemini
   - Correção de texto e imagem validadas com resposta 200 no preview
-- [ ] Validar geração e download de PDF
-  - Geração e renderização validadas; download pelo navegador após a última correção requer confirmação manual
+- [x] Validar geração e download de PDF
+  - PDF A4 de 4 páginas baixado pelo navegador no preview estável em 02/09/2026
 - [x] Criar checkpoint final antes da publicação
 - [ ] Entregar endereço permanente e instruções de domínio próprio
 
@@ -32,18 +32,18 @@
 - [x] Manter o projeto em modo de desenvolvimento com preview acessível por link
 - [x] Não publicar a versão definitiva enquanto a fase de testes não terminar
 
-- [ ] Continuar as validações ponta a ponta no preview sem publicar a versão definitiva
-- [ ] Corrigir e validar qualquer erro restante no login Google
-- [ ] Validar correção, histórico por conta e geração de PDF no preview
+- [x] Continuar as validações ponta a ponta no preview sem publicar a versão definitiva
+- [x] Corrigir e validar qualquer erro restante no login Google
+- [x] Validar correção, histórico por conta e geração de PDF no preview
 
 - [x] Atualizar o modelo Gemini indisponível para o modelo recomendado pelo gateway
 
-- [ ] Corrigir o redirect_uri_mismatch reproduzido no login Google do preview
+- [x] Corrigir o redirect_uri_mismatch reproduzido no login Google do preview
 
 - [x] Melhorar o design e a hierarquia visual do relatório PDF
 - [x] Adicionar resumo visual, paginação e seções de estudo ao PDF
-- [ ] Validar o PDF aprimorado no preview e no arquivo gerado
-  - Arquivo final validado e renderizado; confirmação no preview após a última correção requer teste manual
+- [x] Validar o PDF aprimorado no preview e no arquivo gerado
+  - Arquivo baixado no preview estável e identificado como originado do domínio estável
 
 - [x] Corrigir a falha reportada na correção após a melhoria do PDF
 - [x] Exibir a mensagem técnica real quando uma correção falhar no preview
@@ -70,3 +70,10 @@
 
 - [x] Exportar o commit local a968f44 para erictauzzar-a11y/corretor-enem-supremo na branch main usando o conector GitHub
   - O estado enviado inclui o histórico mesclado e está na descendência de a968f44
+
+- [x] Corrigir novamente o `redirect_uri_mismatch` reproduzido no login Google
+- [x] Reavaliar a interface que permaneceu em “Analisando sua redação...” durante uma chamada longa
+  - O estado mudou para o resultado após o tempo normal da chamada Gemini; não houve reprodução consistente nem alteração de código necessária
+- [x] Validar login Google e persistência de sessão diretamente na URL estável do preview após o retorno OAuth
+- [x] Validar correção autenticada, histórico e download de PDF na URL estável do preview, não apenas em `localhost`
+- [x] Reavaliar o item anterior sobre “Analisando sua redação...” com reprodução consistente e alteração de código comprovada antes de considerá-lo resolvido
