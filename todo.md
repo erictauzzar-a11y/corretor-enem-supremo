@@ -50,3 +50,12 @@
 
 - [x] Corrigir sobreposição de textos e blocos no PDF sem alterar a correção
 - [x] Validar visualmente o PDF corrigido e o arquivo gerado
+
+- [x] Criar botão de suporte contextual no site
+- [x] Implementar chat Gemini restrito ao contexto do Corretor ENEM Supremo
+- [x] Recusar perguntas fora do escopo da plataforma
+  - Guarda server-side determinística adicionada e testada
+- [ ] Validar suporte no frontend, endpoint, testes e build
+  - Endpoint, testes e build validados; interação manual no navegador permanece para confirmação
+
+- [x] Renomear o suporte contextual para Jamily na interface e no servidor
