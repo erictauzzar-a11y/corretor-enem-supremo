@@ -34,6 +34,7 @@ describe("billing access", () => {
 
   it("accepts a correctly signed Stripe test webhook", async () => {
     const secret = "whsec_test_secret";
+    process.env.STRIPE_SECRET_KEY = "sk_test_local_placeholder";
     process.env.STRIPE_WEBHOOK_SECRET = secret;
     const payload = JSON.stringify({ id: "evt_test_verification", object: "event", api_version: "2026-08-26.dahlia", created: 1, livemode: false, pending_webhooks: 0, request: null, type: "checkout.session.expired", data: { object: { id: "cs_test_1", object: "checkout.session", metadata: { user_open_id: "test-user" }, client_reference_id: "test-user" } } });
     const signature = Stripe.webhooks.generateTestHeaderString({ payload, secret });
