@@ -112,27 +112,47 @@ const geminiSchema = {
   }, required: ["finalScore", "transcription", "competencies", "intervention", "pedagogicalReport", "warning"]
 } as const;
 
-async function invokeGemini(text: string, imageDataUrl?: string) {
+type GeminiPayload = { error?: { message?: string }; candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+
+const transcriptionSchema = {
+  type: "OBJECT",
+  properties: { transcription: { type: "STRING" }, warning: { type: "STRING" } },
+  required: ["transcription", "warning"],
+} as const;
+
+async function callGemini(parts: Array<Record<string, unknown>>, schema: Record<string, unknown>) {
   if (!ENV.geminiApiKey) throw new Error("GEMINI_API_KEY não configurada no servidor.");
-  const parts: Array<Record<string, unknown>> = [{ text }];
-  if (imageDataUrl) {
-    const match = imageDataUrl.match(/^data:(image\/[^;]+);base64,(.+)$/);
-    if (!match) throw new Error("Imagem inválida: envie JPG ou PNG em formato válido.");
-    parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
-  }
-  const requestBody = JSON.stringify({ systemInstruction: { parts: [{ text: systemPrompt }] }, contents: [{ role: "user", parts }], generationConfig: { ...GEMINI_GENERATION_CONFIG, responseSchema: geminiSchema } });
+  const requestBody = JSON.stringify({ contents: [{ role: "user", parts }], generationConfig: { ...GEMINI_GENERATION_CONFIG, responseSchema: schema } });
   let response: Response;
-  let payload = {} as { error?: { message?: string }; candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+  let payload: GeminiPayload = {};
   for (let attempt = 0; attempt < 3; attempt += 1) {
     response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ENV.geminiModel}:generateContent?key=${encodeURIComponent(ENV.geminiApiKey)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: requestBody });
-    payload = await response.json() as typeof payload;
+    payload = await response.json() as GeminiPayload;
     if (response.ok) break;
     if (![429, 500, 503].includes(response.status) || attempt === 2) throw new Error(`Gemini API (${response.status}): ${payload.error?.message ?? "erro desconhecido"}`);
     await new Promise(resolve => setTimeout(resolve, 500 * (attempt + 1)));
   }
   const jsonText = payload.candidates?.[0]?.content?.parts?.map(part => part.text ?? "").join("").trim();
   if (!jsonText) throw new Error("O Gemini não retornou uma análise utilizável.");
-  return JSON.parse(jsonText);
+  return JSON.parse(jsonText) as Record<string, unknown>;
+}
+
+async function invokeGemini(text: string, imageDataUrl?: string) {
+  let essayText = text;
+  let imageWarning = "";
+  if (imageDataUrl) {
+    const match = imageDataUrl.match(/^data:(image\/[^;]+);base64,(.+)$/);
+    if (!match) throw new Error("Imagem inválida: envie JPG ou PNG em formato válido.");
+    const transcription = await callGemini([
+      { text: "Transcreva fielmente a redação manuscrita da imagem. Preserve palavras, pontuação e parágrafos; não corrija, complete ou interprete o texto. Se alguma parte estiver ilegível, marque [ilegível] no local e explique isso no warning." },
+      { inlineData: { mimeType: match[1], data: match[2] } },
+    ], transcriptionSchema);
+    essayText = String(transcription.transcription ?? "").trim();
+    imageWarning = String(transcription.warning ?? "").trim();
+    if (!essayText) throw new Error("O Gemini não conseguiu transcrever a redação da imagem.");
+  }
+  const scoringPrompt = `${text}${imageDataUrl ? `\n\nTranscrição fiel extraída da imagem:\n${essayText}\n\nAviso de legibilidade: ${imageWarning || "nenhum"}` : ""}`;
+  return callGemini([{ text: `${systemPrompt}\n\n${scoringPrompt}` }], geminiSchema);
 }
 
 export const appRouter = router({

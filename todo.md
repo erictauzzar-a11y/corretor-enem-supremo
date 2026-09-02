@@ -68,3 +68,6 @@
 - [x] Testar repetidamente a mesma redação em texto, atualizar documentação e sincronizar a correção no GitHub — branch main confirmada no SHA a1d5536
 - [ ] Repetir três chamadas reais com a mesma imagem de redação quando uma imagem de teste for fornecida
 - [x] Validar o fluxo multimodal anteriormente — consistência específica por imagem permanece condicionada à disponibilidade de uma imagem de teste
+- [ ] Corrigir a inconsistência multimodal observada: a mesma imagem retornou 840, 840 e 680
+- [x] Separar transcrição da imagem e pontuação textual em etapas determinísticas
+- [ ] Repetir três chamadas da imagem após a correção e registrar o resultado

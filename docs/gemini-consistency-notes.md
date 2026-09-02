@@ -8,3 +8,7 @@ Fontes consultadas:
 - [Gemini API — Structured outputs](https://ai.google.dev/gemini-api/docs/structured-output)
 
 Decisão do projeto: usar temperatura mínima, solicitar evidência textual observável para cada competência, separar análise de pontuação e exigir coerência entre evidências, nível atribuído e nota final. A validação server-side continuará sendo a autoridade final do contrato.
+
+## Validação multimodal
+
+Antes da separação entre OCR e pontuação, a mesma imagem retornou três vezes: 840 (120/200/160/160/200), 840 (120/200/160/160/200) e 680 (120/160/120/120/160). Isso confirmou que o caminho multimodal conjunto ainda variava. O código foi refatorado para executar OCR separado e depois pontuação textual com os mesmos parâmetros determinísticos. A repetição posterior foi bloqueada pela quota gratuita do Gemini após o teste anterior; deve ser executada quando a quota estiver disponível novamente.
