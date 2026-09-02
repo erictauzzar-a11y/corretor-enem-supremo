@@ -43,3 +43,6 @@
 - [x] Melhorar o design e a hierarquia visual do relatório PDF
 - [x] Adicionar resumo visual, paginação e seções de estudo ao PDF
 - [ ] Validar o PDF aprimorado no preview e no arquivo gerado
+
+- [x] Corrigir a falha reportada na correção após a melhoria do PDF
+- [x] Exibir a mensagem técnica real quando uma correção falhar no preview

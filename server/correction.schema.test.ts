@@ -30,4 +30,12 @@ describe("correctionSchema", () => {
   it("rejeita uma correção com seis competências", () => {
     expect(() => correctionSchema.parse({ ...validCorrection, competencies: [...validCorrection.competencies, competency(200)] })).toThrow();
   });
+
+  it("aceita evidência curta, desde que não esteja vazia", () => {
+    const correction = {
+      ...validCorrection,
+      competencies: validCorrection.competencies.map((item, index) => index === 3 ? { ...item, evidence: ["C1"] } : item),
+    };
+    expect(correctionSchema.parse(correction).competencies[3]?.evidence).toEqual(["C1"]);
+  });
 });

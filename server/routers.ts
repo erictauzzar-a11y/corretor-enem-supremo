@@ -12,7 +12,7 @@ export const competencySchema = z.object({
   title: z.string(),
   summary: z.string(),
   details: z.array(z.string()).min(1),
-  evidence: z.array(z.string().min(8)).min(1).max(5),
+  evidence: z.array(z.string().trim().min(1)).min(1).max(5),
   verdict: z.string(),
   protocolFindings: z.object({ grammar: z.string(), syntax: z.string(), theme: z.string(), textType: z.string(), repertoire: z.string(), project: z.string(), coherence: z.string(), interparagraphCohesion: z.string(), intraparagraphCohesion: z.string(), cohesionInadequacies: z.string() }),
 });
