@@ -89,6 +89,6 @@
 - [x] Commitar as alterações pendentes atuais e fazer push para `erictauzzar-a11y/corretor-enem-supremo` na branch `main`
 - [x] Confirmar a sincronização final comparando o SHA local com o SHA remoto de `main` e registrar a evidência no projeto
 - [x] Só considerar a sincronização concluída após `git status` ficar limpo e o GitHub remoto refletir o commit mais recente
-- [ ] Executar `git status --short` após o último commit/push e garantir árvore limpa
-- [ ] Commitar e enviar quaisquer alterações feitas após `91bfecc` para `erictauzzar-a11y/corretor-enem-supremo` na branch `main`
-- [ ] Confirmar novamente a sincronização final comparando o SHA local atualizado com o SHA remoto de `main` e só então marcar a conclusão
+- [x] Executar `git status --short` após o último commit/push e garantir árvore limpa
+- [x] Commitar e enviar quaisquer alterações feitas após `91bfecc` para `erictauzzar-a11y/corretor-enem-supremo` na branch `main`
+- [x] Confirmar novamente a sincronização final comparando o SHA local atualizado com o SHA remoto de `main` e só então marcar a conclusão
