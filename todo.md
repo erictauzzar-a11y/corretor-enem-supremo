@@ -63,3 +63,7 @@
 - [x] Reformular os textos estranhos do PDF para linguagem clara e natural
 - [x] Simplificar a apresentação das competências e dos achados
 - [x] Renderizar e revisar visualmente o PDF reformulado
+
+- [ ] Sincronizar todas as alterações do projeto com o repositório GitHub
+- [ ] Confirmar que nenhum segredo ou arquivo `.env` será enviado
+- [ ] Atualizar documentação para a próxima IA encontrar o estado atual
