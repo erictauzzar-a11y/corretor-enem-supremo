@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 import { BookOpen, Check, ChevronRight, Clock3, Download, FileImage, FileText, GraduationCap, Lightbulb, Loader2, RotateCcw, Sparkles, Target, Upload, X, Crown, LockKeyhole, ShieldCheck } from "lucide-react";
 import { downloadCorrectionPdf } from "@/lib/pdf";
 import SupportChat from "@/components/SupportChat";
+import { useLocation } from "wouter";
 
 type HistoryItem = {
   id: string;
@@ -42,10 +43,6 @@ function correctionErrorMessage(error: unknown) {
   return "Não foi possível concluir a correção. Verifique o envio e tente novamente.";
 }
 
-function correctionTechnicalDetail(error: unknown) {
-  const message = error instanceof Error ? error.message.trim() : "";
-  return message ? message.slice(0, 500) : "Nenhum detalhe técnico foi retornado pelo servidor.";
-}
 const criteria = [
   { number: "01", title: "Domínio da modalidade escrita formal", text: "Avalia o controle da norma-padrão na construção do texto. Entram aqui ortografia, acentuação, pontuação, concordância, regência, colocação pronominal, escolha vocabular e organização sintática. O corretor observa não apenas quantos desvios existem, mas também sua gravidade, recorrência e impacto na clareza.", focus: "O que diferencia as notas altas: poucos desvios e frases bem construídas, com variedade de períodos sem perder a precisão.", tip: "Como melhorar: revise a redação procurando primeiro erros recorrentes e depois leia cada período perguntando quem pratica a ação, qual é o verbo e se a relação entre as partes está clara.", avoid: "Evite linguagem excessivamente informal, abreviações, frases longas sem pontuação e repetir a mesma palavra quando existe uma alternativa adequada.", example: "Exemplo: em vez de ‘as pessoas não tem acesso’, use ‘as pessoas não têm acesso’; em vez de ligar várias ideias apenas por vírgulas, separe os períodos e use conectivos adequados." },
   { number: "02", title: "Compreensão da proposta e repertório", text: "Verifica se o participante compreende exatamente o recorte temático, desenvolve o assunto sem fugir dele e respeita o texto dissertativo-argumentativo. Também avalia o repertório sociocultural: conhecimentos de história, filosofia, sociologia, ciência, literatura, legislação ou atualidades devem ser pertinentes, legítimos e utilizados para explicar o argumento, não apenas citados.", focus: "O que diferencia as notas altas: uma tese diretamente relacionada ao tema e referências externas conectadas ao raciocínio do parágrafo.", tip: "Como melhorar: transforme cada repertório em argumento, explicando o que ele demonstra e como se relaciona com o problema discutido.", avoid: "Evite mencionar uma personalidade, lei ou dado de forma decorativa, usar informações duvidosas ou discutir apenas o assunto geral sem atender ao recorte proposto.", example: "Exemplo: citar a Constituição Federal é insuficiente sozinho; é melhor explicar que o princípio da igualdade fundamenta a necessidade de combater a desigualdade discutida." },
@@ -61,50 +58,49 @@ export default function Home() {
   const [imageName, setImageName] = useState("");
   const [result, setResult] = useState<Correction>();
   const [mode, setMode] = useState<"text" | "image">("text");
-  const [uploadError, setUploadError] = useState("");
+  const [, navigate] = useLocation();
   const fileRef = useRef<HTMLInputElement>(null);
-  const correction = trpc.correction.analyze.useMutation({ onSuccess: data => setResult(data as Correction) });
+  const correction = trpc.correction.analyze.useMutation({ onSuccess: data => { setResult(data as Correction); toast.success("Sua correção foi finalizada."); } });
   const billingQuery = trpc.billing.status.useQuery(undefined, { enabled: Boolean(authUser), retry: false });
-  const checkout = trpc.billing.checkout.useMutation({ onSuccess: ({ url }) => window.open(url, "_blank", "noopener,noreferrer") });
   const historyQuery = trpc.correction.history.useQuery(undefined, { enabled: Boolean(authUser), retry: false });
   useEffect(() => {
     if (!supabase) return;
     void supabase.auth.getUser().then(({ data }) => setAuthUser(data.user));
   }, []);
   useEffect(() => {
+    if (correction.error) toast.error(correctionErrorMessage(correction.error));
+  }, [correction.error]);
+  useEffect(() => {
     const checkoutState = new URLSearchParams(window.location.search).get("checkout");
     if (checkoutState === "success") {
-      setUploadError("Pagamento recebido. Seu plano será ativado após a confirmação do Stripe.");
+      toast.success("Pagamento recebido. Seu plano será ativado após a confirmação.");
       void billingQuery.refetch();
     } else if (checkoutState === "cancelled") {
-      setUploadError("O checkout foi cancelado. Você pode tentar novamente quando quiser.");
+      toast.info("A compra foi cancelada. Você pode tentar novamente quando quiser.");
     }
   }, [billingQuery.refetch]);
 
   const handleFile = (file?: File) => {
     if (!file) return;
     if (!file.type.startsWith("image/") || file.size > 8 * 1024 * 1024) {
-      setUploadError("Escolha uma imagem JPG ou PNG com até 8 MB.");
+      toast.info("Escolha uma imagem JPG ou PNG com até 8 MB.");
       return;
     }
-    setUploadError("");
     const reader = new FileReader();
     reader.onload = () => { setImageDataUrl(String(reader.result)); setImageName(file.name); };
     reader.readAsDataURL(file);
   };
 
   const submit = () => {
-    if (!authUser) { setUploadError("Crie uma conta ou entre para usar a correção gratuita."); return; }
-    if (!billingQuery.data?.paid && mode === "image") { setUploadError("A correção por imagem está disponível no plano anual."); return; }
-    if (mode === "text" && !text.trim()) { setUploadError("Digite ou cole sua redação antes de continuar."); return; }
-    if (mode === "image" && !imageDataUrl) { setUploadError("Selecione uma imagem da redação antes de continuar."); return; }
-    setUploadError("");
+    if (!authUser) { toast.info("Crie uma conta ou entre para usar a correção gratuita."); return; }
+    if (!billingQuery.data?.paid && mode === "image") { toast.info("A correção por imagem está disponível no plano anual."); return; }
+    if (mode === "text" && !text.trim()) { toast.info("Digite ou cole sua redação antes de continuar."); return; }
+    if (mode === "image" && !imageDataUrl) { toast.info("Selecione uma imagem da redação antes de continuar."); return; }
     correction.mutate({ text: mode === "text" ? text : undefined, imageDataUrl: mode === "image" ? imageDataUrl : undefined });
   };
   const reset = () => { setResult(undefined); setText(""); setImageDataUrl(undefined); setImageName(""); correction.reset(); };
   const buyPlan = () => {
-    if (!authUser) { setUploadError("Crie uma conta ou entre antes de ativar o plano anual."); return; }
-    checkout.mutate();
+    navigate("/comprar");
   };
 
   const downloadPdf = () => {
@@ -138,17 +134,16 @@ export default function Home() {
           <Card className="overflow-hidden rounded-[24px] border-0 bg-white shadow-[0_24px_70px_rgba(39,57,107,0.12)]">
             <CardHeader className="border-b border-[#eef0f6] px-6 pb-5 pt-6 sm:px-8"><div className="flex items-start justify-between"><div><CardTitle className="text-xl font-bold tracking-tight">Comece sua correção</CardTitle><p className="mt-1.5 text-sm text-[#8891a6]">Escolha como deseja enviar sua redação.</p></div><div className="rounded-xl bg-[#f1f4ff] p-2.5 text-[#3155d8]"><BookOpen className="h-5 w-5" /></div></div></CardHeader>
             <CardContent className="px-6 pb-7 pt-6 sm:px-8">
-              <div className="mb-5 grid grid-cols-2 gap-2 rounded-xl bg-[#f5f6fa] p-1.5"><button onClick={() => setMode("text")} className={`mode-tab ${mode === "text" ? "mode-tab-active" : ""}`}><FileText className="h-4 w-4" />Texto digitado</button><button onClick={() => { if (billingQuery.data?.paid) setMode("image"); else setUploadError("A correção por imagem está disponível no plano anual."); }} className={`mode-tab ${mode === "image" ? "mode-tab-active" : ""} ${!billingQuery.data?.paid ? "opacity-60" : ""}`}><FileImage className="h-4 w-4" />Imagem {!billingQuery.data?.paid && <LockKeyhole className="h-3 w-3" />}</button></div>
+              <div className="mb-5 grid grid-cols-2 gap-2 rounded-xl bg-[#f5f6fa] p-1.5"><button onClick={() => setMode("text")} className={`mode-tab ${mode === "text" ? "mode-tab-active" : ""}`}><FileText className="h-4 w-4" />Texto digitado</button><button onClick={() => { if (billingQuery.data?.paid) setMode("image"); else toast.info("A correção por imagem está disponível no plano anual."); }} className={`mode-tab ${mode === "image" ? "mode-tab-active" : ""} ${!billingQuery.data?.paid ? "opacity-60" : ""}`}><FileImage className="h-4 w-4" />Imagem {!billingQuery.data?.paid && <LockKeyhole className="h-3 w-3" />}</button></div>
               {mode === "text" ? <div><Textarea value={text} onChange={e => setText(e.target.value)} placeholder="Cole ou digite sua redação aqui..." className="min-h-[250px] resize-none rounded-2xl border-[#e2e5ee] bg-[#fbfcfe] p-4 text-[15px] leading-7 shadow-none placeholder:text-[#a9b0c1] focus-visible:ring-[#bfcaff]" /><div className="mt-2 flex justify-between text-xs text-[#9aa2b4]"><span>Recomendado: entre 20 e 30 linhas</span><span>{text.length} caracteres</span></div></div> : <div className="relative flex min-h-[250px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#cfd7f5] bg-[#fafbff] px-6 text-center"><input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => handleFile(e.target.files?.[0])} />{imageDataUrl ? <><img src={imageDataUrl} alt="Pré-visualização da redação" className="max-h-44 rounded-lg object-contain shadow-sm" /><div className="mt-3 flex items-center gap-2 text-sm font-semibold text-[#45516d]"><FileImage className="h-4 w-4 text-[#3155d8]" />{imageName}<button onClick={() => { setImageDataUrl(undefined); setImageName(""); }} aria-label="Remover imagem"><X className="h-4 w-4 text-[#9aa2b4]" /></button></div></> : <><div className="mb-3 rounded-full bg-[#eaf0ff] p-3 text-[#3155d8]"><Upload className="h-5 w-5" /></div><p className="text-sm font-semibold text-[#46536e]">Envie uma foto da sua redação</p><p className="mt-1 text-xs text-[#9aa2b4]">JPG ou PNG, até 8 MB</p><Button onClick={() => fileRef.current?.click()} variant="outline" className="mt-4 rounded-xl border-[#dbe1f3] bg-white text-[#3155d8] hover:bg-[#f1f4ff]">Selecionar arquivo</Button></>}</div>}
-              {(uploadError || correction.error) && <Alert className="mt-4 border-[#ffd5d5] bg-[#fff7f7] text-[#b94242]"><AlertDescription><p>{uploadError || correctionErrorMessage(correction.error)}</p>{!uploadError && correction.error && <details className="mt-2 text-xs"><summary className="cursor-pointer font-semibold">Ver detalhe técnico</summary><pre className="mt-2 max-h-24 overflow-auto whitespace-pre-wrap rounded-lg bg-white/70 p-2 font-mono text-[10px] text-[#7f3f3f]">{correctionTechnicalDetail(correction.error)}</pre></details>}</AlertDescription></Alert>}
-              <Button onClick={submit} disabled={correction.isPending || (mode === "text" ? !text.trim() : !imageDataUrl)} className="mt-6 h-12 w-full rounded-xl bg-[#3155d8] text-sm font-bold shadow-[0_8px_20px_rgba(49,85,216,0.22)] transition hover:bg-[#2546c3] active:scale-[0.98]">{correction.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Analisando sua redação...</> : <>Corrigir minha redação <ChevronRight className="ml-2 h-4 w-4" /></>}</Button>
+                      <Button onClick={submit} disabled={correction.isPending || (mode === "text" ? !text.trim() : !imageDataUrl)} className="mt-6 h-12 w-full rounded-xl bg-[#3155d8] text-sm font-bold shadow-[0_8px_20px_rgba(49,85,216,0.22)] transition hover:bg-[#2546c3] active:scale-[0.98]">{correction.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Analisando sua redação...</> : <>Corrigir minha redação <ChevronRight className="ml-2 h-4 w-4" /></>}</Button>
               <p className="mt-3 text-center text-[11px] text-[#9aa2b4]">Sua redação é usada apenas para gerar esta análise.</p>
             </CardContent>
           </Card>
         </section>
 
         <section id="plano" className="mt-14 grid gap-5 lg:grid-cols-[1fr_1.1fr]">
-          <Card className="border-[#dfe5ff] bg-[#f7f9ff] shadow-sm"><CardContent className="p-6 sm:p-8"><div className="flex items-center gap-2 text-[#3155d8]"><Crown className="h-5 w-5" /><span className="text-xs font-bold uppercase tracking-[0.18em]">Plano AprovAI</span></div><h2 className="mt-3 text-2xl font-extrabold tracking-tight text-[#17233d]">{billingQuery.data?.paid ? "Seu plano AprovAI está ativo" : "Correções ilimitadas por R$ 37 ao ano"}</h2><p className="mt-3 max-w-xl text-sm leading-6 text-[#66708a]">Faça quantas correções precisar, por texto ou imagem, com histórico, PDF e análise pedagógica completa.</p><Button onClick={buyPlan} disabled={checkout.isPending || billingQuery.data?.paid} className="mt-6 rounded-xl bg-[#3155d8] font-bold text-white hover:bg-[#2546c3]">{checkout.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : billingQuery.data?.paid ? <ShieldCheck className="mr-2 h-4 w-4" /> : <Crown className="mr-2 h-4 w-4" />}{billingQuery.data?.paid ? "Plano ativo" : "Ativar plano anual"}</Button><p className="mt-3 text-xs text-[#7d88a0]">Checkout seguro processado pelo Stripe. Renovação automática anual.</p></CardContent></Card>
+          <Card className="border-[#dfe5ff] bg-[#f7f9ff] shadow-sm"><CardContent className="p-6 sm:p-8"><div className="flex items-center gap-2 text-[#3155d8]"><Crown className="h-5 w-5" /><span className="text-xs font-bold uppercase tracking-[0.18em]">Plano AprovAI</span></div><h2 className="mt-3 text-2xl font-extrabold tracking-tight text-[#17233d]">{billingQuery.data?.paid ? "Seu plano AprovAI está ativo" : "Correções ilimitadas por R$ 37 ao ano"}</h2><p className="mt-3 max-w-xl text-sm leading-6 text-[#66708a]">Faça quantas correções precisar, por texto ou imagem, com histórico, PDF e análise pedagógica completa.</p><Button onClick={buyPlan} disabled={billingQuery.data?.paid} className="mt-6 rounded-xl bg-[#3155d8] font-bold text-white hover:bg-[#2546c3]">{billingQuery.data?.paid ? <ShieldCheck className="mr-2 h-4 w-4" /> : <Crown className="mr-2 h-4 w-4" />}{billingQuery.data?.paid ? "Plano ativo" : "Ativar plano anual"}</Button><p className="mt-3 text-xs text-[#7d88a0]">Checkout seguro processado pelo Stripe. Renovação automática anual.</p></CardContent></Card>
           <Card className="border-[#e7eaf2] bg-white shadow-sm"><CardContent className="grid gap-4 p-6 sm:grid-cols-2 sm:p-8"><div><div className="flex items-center gap-2 text-[#3155d8]"><LockKeyhole className="h-4 w-4" /><span className="text-xs font-bold uppercase tracking-wider">Grátis</span></div><p className="mt-2 text-sm leading-6 text-[#66708a]">1 correção por texto após criar sua conta.</p></div><div><div className="flex items-center gap-2 text-[#24734a]"><ShieldCheck className="h-4 w-4" /><span className="text-xs font-bold uppercase tracking-wider">AprovAI</span></div><p className="mt-2 text-sm leading-6 text-[#66708a]">Texto, imagem, PDF, histórico e análise pedagógica ilimitados.</p></div></CardContent></Card>
         </section>
 
