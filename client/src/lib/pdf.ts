@@ -58,7 +58,7 @@ const checklistLabels: Record<string, string> = {
   detail: "Detalhamento",
 };
 
-export function downloadCorrectionPdf(result: CorrectionPdfData) {
+export function createCorrectionPdf(result: CorrectionPdfData) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const margin = 42;
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -162,40 +162,36 @@ export function downloadCorrectionPdf(result: CorrectionPdfData) {
   };
 
   const drawCompetency = (item: CorrectionPdfData["competencies"][number], index: number) => {
-    const titleLines = wrapped(item.title, 11, contentWidth - 76);
-    const summaryLines = wrapped(item.summary, 9, contentWidth - 24);
-    const baseHeight = 74 + titleLines.length * 14 + summaryLines.length * 13;
-    ensureSpace(Math.min(baseHeight, 180));
-    fillColor("white");
-    strokeColor("line");
-    doc.setLineWidth(0.8);
-    doc.roundedRect(margin, y - 12, contentWidth, Math.min(baseHeight, 210), 10, 10, "FD");
+    ensureSpace(92);
+    const blockStart = y - 14;
+    fillColor("paleBlue");
+    doc.roundedRect(margin, blockStart, contentWidth, 56, 10, 10, "F");
     fillColor("blue");
-    doc.roundedRect(margin, y - 12, 52, 52, 10, 10, "F");
+    doc.roundedRect(margin + 12, y - 3, 42, 34, 8, 8, "F");
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
     doc.setTextColor(...colors.white);
-    doc.text(`C${index + 1}`, margin + 26, y + 10, { align: "center" });
-    doc.setFontSize(18);
-    doc.text(`${item.score}`, margin + 26, y + 31, { align: "center" });
-    doc.setFontSize(8);
-    doc.text("/200", margin + 26, y + 43, { align: "center" });
+    doc.text(`C${index + 1}`, margin + 33, y + 9, { align: "center" });
+    doc.setFontSize(16);
+    doc.text(`${item.score}`, margin + 33, y + 26, { align: "center" });
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
     setColor("navy");
-    doc.text(titleLines, margin + 66, y + 1);
-    y += titleLines.length * 14 + 13;
+    doc.text(wrapped(item.title, 11, contentWidth - 86), margin + 70, y + 5);
+    y += 47;
     paragraph(item.summary, 9, "ink", 6);
+    ensureSpace(18);
     fillColor("line");
     doc.roundedRect(margin + 12, y - 2, contentWidth - 24, 6, 3, 3, "F");
     fillColor("blue");
     doc.roundedRect(margin + 12, y - 2, (contentWidth - 24) * Math.max(0, Math.min(item.score / 200, 1)), 6, 3, 3, "F");
     y += 18;
-    Object.entries(item.protocolFindings).forEach(([key, value]) => labeledValue(protocolLabels[key] ?? key, value, contentWidth - 24));
-    item.details.slice(0, 4).forEach(detail => paragraph(`• ${detail}`, 8.5, "muted", 4));
+    item.protocolFindings && Object.entries(item.protocolFindings).forEach(([key, value]) => {
+      paragraph(`${protocolLabels[key] ?? key}: ${value}`, 8.5, "muted", 5);
+    });
+    item.details.slice(0, 4).forEach(detail => paragraph(`Observação: ${detail}`, 8.5, "ink", 4));
     item.evidence.slice(0, 3).forEach(evidence => paragraph(`Evidência: ${evidence}`, 8.5, "ink", 4));
-    paragraph(`Veredito: ${item.verdict}`, 9, "navy", 12, true);
-    y += 6;
+    paragraph(`Veredito: ${item.verdict}`, 9, "navy", 15, true);
   };
 
   fillColor("navy");
@@ -260,5 +256,9 @@ export function downloadCorrectionPdf(result: CorrectionPdfData) {
   }
 
   footer();
-  doc.save(`relatorio-corretor-enem-${result.finalScore}.pdf`);
+  return doc;
+}
+
+export function downloadCorrectionPdf(result: CorrectionPdfData) {
+  createCorrectionPdf(result).save(`relatorio-corretor-enem-${result.finalScore}.pdf`);
 }

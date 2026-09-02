@@ -18,7 +18,7 @@
 - [x] Validar correção por texto e imagem com Gemini
   - Correção de texto e imagem validadas com resposta 200 no preview
 - [ ] Validar geração e download de PDF
-  - Geração do PDF validada com jsPDF; download no navegador permanece para teste manual
+  - Geração e renderização validadas; download pelo navegador após a última correção requer confirmação manual
 - [x] Criar checkpoint final antes da publicação
 - [ ] Entregar endereço permanente e instruções de domínio próprio
 
@@ -43,6 +43,10 @@
 - [x] Melhorar o design e a hierarquia visual do relatório PDF
 - [x] Adicionar resumo visual, paginação e seções de estudo ao PDF
 - [ ] Validar o PDF aprimorado no preview e no arquivo gerado
+  - Arquivo final validado e renderizado; confirmação no preview após a última correção requer teste manual
 
 - [x] Corrigir a falha reportada na correção após a melhoria do PDF
 - [x] Exibir a mensagem técnica real quando uma correção falhar no preview
+
+- [x] Corrigir sobreposição de textos e blocos no PDF sem alterar a correção
+- [x] Validar visualmente o PDF corrigido e o arquivo gerado
