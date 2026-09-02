@@ -9,6 +9,7 @@ import Purchase from "./pages/Purchase";
 import Dashboard from "./pages/Dashboard";
 import Corrections from "./pages/Corrections";
 import Performance from "./pages/Performance";
+import Training from "./pages/Training";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -19,6 +20,7 @@ function Router() {
       <Route path={"/painel"} component={Dashboard} />
       <Route path={"/redacoes"} component={Corrections} />
       <Route path={"/desempenho"} component={Performance} />
+      <Route path={"/treinos"} component={Training} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

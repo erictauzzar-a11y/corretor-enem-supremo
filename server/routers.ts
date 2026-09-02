@@ -105,6 +105,10 @@ const supportJsonSchema = {
 } as const;
 
 export const supportOutOfScopeMessage = "Posso ajudar apenas com o AprovAI, redação do ENEM, histórico, autenticação e relatórios em PDF.";
+
+const trainingInputSchema = z.object({ category: z.string().trim().min(2).max(80), prompt: z.string().trim().min(10).max(500), answer: z.string().trim().min(10).max(4000) });
+const trainingSchema = z.object({ feedback: z.string().trim().min(1).max(4000), nextStep: z.string().trim().min(1).max(1000) });
+const trainingJsonSchema = { type: "OBJECT", properties: { feedback: { type: "STRING" }, nextStep: { type: "STRING" } }, required: ["feedback", "nextStep"] } as const;
 const supportScopeTerms = /corretor|enem|redação|redacao|correção|correcao|histórico|historico|pdf|login|senha|google|cadastro|imagem|texto|nota|competência|competencia|relatório|relatorio|suporte|site|conta|redação|redacao/i;
 export const isSupportQuestionInScope = (message: string) => supportScopeTerms.test(message);
 
@@ -207,6 +211,12 @@ export const appRouter = router({
         const parsed = supportSchema.parse(raw);
         return parsed.inScope ? parsed : { answer: supportOutOfScopeMessage, inScope: false };
       }),
+  }),
+  training: router({
+    evaluate: protectedProcedure.input(trainingInputSchema).mutation(async ({ input }) => {
+      const raw = await callGemini([{ text: `Avalie de forma pedagógica e específica a resposta de um aluno em um exercício de redação do ENEM. Não seja genérico. Aponte o que foi bem feito, o que precisa ser ajustado e dê um próximo passo prático. Exercício (${input.category}): ${input.prompt}\nResposta do aluno:\n${input.answer}` }], trainingJsonSchema);
+      return trainingSchema.parse(raw);
+    }),
   }),
   billing: router({
     status: protectedProcedure.query(async ({ ctx }) => {
