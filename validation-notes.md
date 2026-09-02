@@ -33,3 +33,7 @@ A captura final do navegador (`/home/ubuntu/screenshots/3000-iklen2qnt7dm3wl_202
 ## Evidência visual ampliada do chat
 
 Para tornar a auditoria inequívoca, o painel do chat foi expandido temporariamente apenas no navegador e rolado ao trecho correspondente. A captura `/home/ubuntu/screenshots/3000-iklen2qnt7dm3wl_2026-09-02_12-57-04_1945.webp` mostra diretamente no frontend a resposta da Jamily explicando as cinco competências, cada uma valendo até 200 pontos, totalizando 1000, e a mensagem posterior de recusa para “Qual é a previsão do tempo hoje?”: “Posso ajudar apenas com o Corretor ENEM Supremo, redação do ENEM, histórico, autenticação e relatórios em PDF.” A alteração de tamanho foi somente um ajuste de inspeção no DOM do navegador e não foi gravada no código da aplicação.
+
+## Sincronização GitHub final
+
+Em 02/09/2026, as alterações pendentes foram commitadas e enviadas para `erictauzzar-a11y/corretor-enem-supremo`, branch `main`. A confirmação via GitHub CLI retornou o mesmo SHA local e remoto: `91bfecc3f68a3193d21dca516ec8844d33b231d1` (`Track final GitHub synchronization`). O repositório remoto existente foi utilizado; nenhum repositório novo foi criado.
