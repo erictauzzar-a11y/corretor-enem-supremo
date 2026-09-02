@@ -19,7 +19,7 @@
   - Requer execução ponta a ponta no preview publicado
 - [ ] Validar geração e download de PDF
   - Requer uma correção concluída no preview publicado
-- [ ] Criar checkpoint final antes da publicação
+- [x] Criar checkpoint final antes da publicação
 - [ ] Entregar endereço permanente e instruções de domínio próprio
 
 ## Histórico de problemas
