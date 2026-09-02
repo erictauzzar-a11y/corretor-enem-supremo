@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client";
 import superjson from "superjson";
 import App from "./App";
 import { startLogin } from "./const";
+import { supabase } from "./lib/supabase";
 import "./index.css";
 
 const queryClient = new QueryClient();
@@ -62,9 +63,18 @@ const trpcClient = trpc.createClient({
         }
         return {};
       },
-      fetch(input, init) {
+      async fetch(input, init) {
+        const headers = new Headers(init?.headers);
+        try {
+          const sessionResult = supabase ? await supabase.auth.getSession() : null;
+          const accessToken = sessionResult?.data.session?.access_token;
+          if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);
+        } catch {
+          // Continue with the Manus cookie when a Supabase session is unavailable.
+        }
         return globalThis.fetch(input, {
           ...(init ?? {}),
+          headers,
           credentials: "include",
         });
       },
