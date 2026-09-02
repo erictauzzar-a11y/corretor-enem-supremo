@@ -115,7 +115,7 @@ export default function Home() {
             <div className="brand-mark"><GraduationCap className="h-5 w-5" /></div>
             <div><p className="text-[15px] font-bold tracking-tight">AprovAI</p><p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#788199]">AprovAI</p></div>
           </div>
-          <div className="flex items-center gap-3 text-sm font-medium text-[#788199]"><div className="hidden items-center gap-6 md:flex"><a href="#como-funciona" className="transition hover:text-[#3155d8]">Como funciona</a><a href="#criterios" className="transition hover:text-[#3155d8]">Critérios</a><Badge className="rounded-full bg-[#edf1ff] px-3 py-1 text-[#3155d8] hover:bg-[#edf1ff]">IA pedagógica</Badge></div><AuthDialog user={authUser} onUserChange={setAuthUser} /></div>
+          <div className="flex items-center gap-3 text-sm font-medium text-[#788199]"><div className="hidden items-center gap-6 md:flex"><a href="#como-funciona" className="transition hover:text-[#3155d8]">Como funciona</a><a href="#criterios" className="transition hover:text-[#3155d8]">Critérios</a>{authUser && <a href="/painel" className="transition hover:text-[#3155d8]">Meu painel</a>}<Badge className="rounded-full bg-[#edf1ff] px-3 py-1 text-[#3155d8] hover:bg-[#edf1ff]">IA pedagógica</Badge></div><AuthDialog user={authUser} onUserChange={setAuthUser} /></div>
         </div>
       </header>
 
