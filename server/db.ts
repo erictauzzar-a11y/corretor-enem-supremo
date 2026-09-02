@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, billingAccounts, type BillingAccount } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -87,6 +87,33 @@ export async function getUserByOpenId(openId: string) {
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
 
   return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getBillingAccount(openId: string): Promise<BillingAccount | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const rows = await db.select().from(billingAccounts).where(eq(billingAccounts.openId, openId)).limit(1);
+  return rows[0];
+}
+
+export async function getBillingAccountByCustomerId(stripeCustomerId: string): Promise<BillingAccount | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const rows = await db.select().from(billingAccounts).where(eq(billingAccounts.stripeCustomerId, stripeCustomerId)).limit(1);
+  return rows[0];
+}
+
+export async function upsertBillingAccount(input: Partial<BillingAccount> & { openId: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database de cobrança indisponível.");
+  const values = { openId: input.openId, stripeCustomerId: input.stripeCustomerId ?? null, stripeSubscriptionId: input.stripeSubscriptionId ?? null, subscriptionStatus: input.subscriptionStatus ?? null, currentPeriodEnd: input.currentPeriodEnd ?? null, freeCorrectionUsedAt: input.freeCorrectionUsedAt ?? null };
+  await db.insert(billingAccounts).values(values).onDuplicateKeyUpdate({ set: { ...values, updatedAt: new Date() } });
+}
+
+export async function markFreeCorrectionUsed(openId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database de cobrança indisponível.");
+  await upsertBillingAccount({ openId, freeCorrectionUsedAt: new Date() });
 }
 
 // TODO: add feature queries here as your schema grows.

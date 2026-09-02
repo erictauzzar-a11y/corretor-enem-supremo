@@ -25,4 +25,17 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+export const billingAccounts = mysqlTable("billing_accounts", {
+  id: int("id").autoincrement().primaryKey(),
+  openId: varchar("openId", { length: 128 }).notNull().unique(),
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }),
+  subscriptionStatus: varchar("subscriptionStatus", { length: 32 }),
+  currentPeriodEnd: timestamp("currentPeriodEnd"),
+  freeCorrectionUsedAt: timestamp("freeCorrectionUsedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BillingAccount = typeof billingAccounts.$inferSelect;
+export type InsertBillingAccount = typeof billingAccounts.$inferInsert;
