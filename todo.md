@@ -15,10 +15,10 @@
 - [x] Validar typecheck, testes e build de produção
 - [ ] Validar autenticação e persistência no preview de produção
   - Requer teste com uma conta real após o primeiro publish
-- [ ] Validar correção por texto e imagem com Gemini
-  - Correção de texto validada no preview; imagem permanece para teste multimodal
+- [x] Validar correção por texto e imagem com Gemini
+  - Correção de texto e imagem validadas com resposta 200 no preview
 - [ ] Validar geração e download de PDF
-  - Requer uma correção concluída no preview publicado
+  - Geração do PDF validada com jsPDF; download no navegador permanece para teste manual
 - [x] Criar checkpoint final antes da publicação
 - [ ] Entregar endereço permanente e instruções de domínio próprio
 
