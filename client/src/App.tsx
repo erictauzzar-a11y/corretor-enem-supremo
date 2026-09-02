@@ -11,6 +11,7 @@ import Corrections from "./pages/Corrections";
 import Performance from "./pages/Performance";
 import Training from "./pages/Training";
 import Plan from "./pages/Plan";
+import Challenges from "./pages/Challenges";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -23,6 +24,7 @@ function Router() {
       <Route path={"/desempenho"} component={Performance} />
       <Route path={"/treinos"} component={Training} />
       <Route path={"/plano"} component={Plan} />
+      <Route path={"/desafios"} component={Challenges} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
