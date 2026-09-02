@@ -85,3 +85,7 @@
   - Captura direta: `screenshots/3000-iklen2qnt7dm3wl_2026-09-02_12-57-04_1945.webp`
 - [x] Validar no navegador a renderização da recusa fora de escopo da Jamily e então revalidar o fluxo principal de suporte no preview estável
   - A mesma captura direta mostra a pergunta sobre previsão do tempo e a recusa contextual renderizada
+- [x] Sincronizar novamente todas as alterações atuais com `erictauzzar-a11y/corretor-enem-supremo` na branch `main` e confirmar o commit remoto
+- [ ] Commitar as alterações pendentes atuais e fazer push para `erictauzzar-a11y/corretor-enem-supremo` na branch `main`
+- [ ] Confirmar a sincronização final comparando o SHA local com o SHA remoto de `main` e registrar a evidência no projeto
+- [ ] Só considerar a sincronização concluída após `git status` ficar limpo e o GitHub remoto refletir o commit mais recente
