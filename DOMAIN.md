@@ -1,4 +1,4 @@
-# Endereço e domínio do Corretor ENEM Supremo
+# Endereço e domínio do AprovAI
 
 ## Estado atual
 

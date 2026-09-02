@@ -9,7 +9,7 @@ type ChatMessage = { role: "user" | "assistant"; content: string };
 
 const welcome: ChatMessage = {
   role: "assistant",
-  content: "Olá, eu sou a Jamily. Posso ajudar com o uso do Corretor ENEM Supremo, correção de redações, competências do ENEM, histórico, login e relatórios em PDF.",
+  content: "Olá, eu sou a Jamily. Posso ajudar com o uso do AprovAI, correção de redações, competências do ENEM, histórico, login e relatórios em PDF.",
 };
 
 export default function SupportChat() {

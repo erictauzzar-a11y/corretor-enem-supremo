@@ -1,4 +1,4 @@
-# Corretor ENEM Supremo
+# AprovAI
 
 Aplicação web open source para apoiar a correção pedagógica de redações do ENEM. O sistema aceita texto digitado e imagem manuscrita, envia a redação para uma análise multimodal no servidor e apresenta nota final, competências, proposta de intervenção e parecer pedagógico.
 

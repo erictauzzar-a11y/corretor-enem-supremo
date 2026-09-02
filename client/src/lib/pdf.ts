@@ -78,7 +78,7 @@ export function createCorrectionPdf(result: CorrectionPdfData) {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     setColor("muted");
-    doc.text("Corretor ENEM Supremo · Relatório orientativo", margin, pageHeight - 22);
+    doc.text("AprovAI · Relatório orientativo", margin, pageHeight - 22);
     doc.text(`${pageNumber}`, pageWidth - margin, pageHeight - 22, { align: "right" });
   };
 
@@ -214,7 +214,7 @@ export function createCorrectionPdf(result: CorrectionPdfData) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(24);
   doc.setTextColor(...colors.white);
-  doc.text("Corretor ENEM Supremo", margin, 54);
+  doc.text("AprovAI", margin, 54);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(11);
   doc.setTextColor(201, 213, 255);

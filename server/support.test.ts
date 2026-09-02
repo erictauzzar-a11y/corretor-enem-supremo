@@ -14,6 +14,6 @@ describe("support input", () => {
   it("classifica e bloqueia assuntos fora do escopo", () => {
     expect(isSupportQuestionInScope("Como baixo meu relatório PDF?"),).toBe(true);
     expect(isSupportQuestionInScope("Qual é a previsão do tempo?"),).toBe(false);
-    expect(supportOutOfScopeMessage).toContain("Corretor ENEM Supremo");
+    expect(supportOutOfScopeMessage).toContain("AprovAI");
   });
 });

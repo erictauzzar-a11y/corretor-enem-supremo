@@ -52,7 +52,7 @@
 - [x] Validar visualmente o PDF corrigido e o arquivo gerado
 
 - [x] Criar botão de suporte contextual no site
-- [x] Implementar chat Gemini restrito ao contexto do Corretor ENEM Supremo
+- [x] Implementar chat Gemini restrito ao contexto do AprovAI
 - [x] Recusar perguntas fora do escopo da plataforma
   - Guarda server-side determinística adicionada e testada
 - [x] Validar suporte no frontend, endpoint, testes e build
@@ -110,7 +110,7 @@
 
 ## Venda da plataforma — assinatura anual
 
-- [x] Definir a oferta anual do Corretor ENEM Supremo por R$ 37,00
+- [x] Definir a oferta anual do AprovAI por R$ 37,00
 - [x] Adicionar área de compra e apresentação da oferta no site
   - Oferta visual validada no preview; imagem bloqueada para contas sem plano e CTA anual exibido
 - [x] Configurar integração de pagamentos com checkout seguro
@@ -144,3 +144,15 @@
 - [ ] Confirmar webhook de assinatura no ambiente Stripe com BRL habilitado
 
 Observação: a conta Stripe conectada ao ambiente atual retornou que aceita apenas ARS. O produto permanece corretamente configurado em BRL por R$ 37,00; não foi feita conversão silenciosa para outra moeda.
+
+## Renomeação da marca para AprovAI
+
+- [x] Substituir a marca Corretor ENEM Supremo por AprovAI na interface
+- [x] Atualizar título, nome do produto, checkout e mensagens do suporte
+- [x] Atualizar textos públicos, documentação e metadados sem alterar secrets
+  - O slug técnico `corretor-enem-supremo-permanente` foi preservado para não quebrar o projeto administrado; o nome público está como AprovAI
+- [x] Atualizar VITE_APP_TITLE para AprovAI
+- [x] Verificar que a marca antiga não permanece em arquivos ativos
+- [x] Executar testes, typecheck e build após a renomeação
+- [x] Validar visualmente o preview com a marca AprovAI
+- [ ] Criar checkpoint da renomeação

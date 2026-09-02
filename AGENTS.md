@@ -2,7 +2,7 @@
 
 ## Missão
 
-Este repositório implementa o Corretor ENEM Supremo, uma aplicação educacional para análise de redações. Preserve a experiência em português do Brasil e o formato obrigatório de resposta definido no prompt do produto.
+Este repositório implementa o AprovAI, uma aplicação educacional para análise de redações. Preserve a experiência em português do Brasil e o formato obrigatório de resposta definido no prompt do produto.
 
 ## Antes de editar
 

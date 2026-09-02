@@ -1,4 +1,4 @@
-# Guia de continuidade — Corretor ENEM Supremo
+# Guia de continuidade — AprovAI
 
 ## Estado atual
 
