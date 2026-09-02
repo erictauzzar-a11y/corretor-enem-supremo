@@ -155,4 +155,14 @@ Observação: a conta Stripe conectada ao ambiente atual retornou que aceita ape
 - [x] Verificar que a marca antiga não permanece em arquivos ativos
 - [x] Executar testes, typecheck e build após a renomeação
 - [x] Validar visualmente o preview com a marca AprovAI
-- [ ] Criar checkpoint da renomeação
+- [x] Criar checkpoint da renomeação
+
+## Handoff e sincronização final com GitHub
+
+- [ ] Criar documentação objetiva para a próxima pessoa ou IA continuar o projeto AprovAI
+- [ ] Revisar arquivos sensíveis e confirmar que nenhum secret será enviado
+- [ ] Validar testes, typecheck e build antes do commit
+- [ ] Commitar o estado atual na branch main
+- [ ] Enviar o commit para erictauzzar-a11y/corretor-enem-supremo
+- [ ] Confirmar que o SHA local e o SHA remoto são iguais
+- [ ] Confirmar que a árvore local ficou limpa após o push
