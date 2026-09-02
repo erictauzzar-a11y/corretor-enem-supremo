@@ -38,16 +38,16 @@ const colors = {
 };
 
 const protocolLabels: Record<string, string> = {
-  grammar: "Desvios gramaticais e ortográficos",
-  syntax: "Falhas de estrutura sintática",
-  theme: "Adequação ao tema",
-  textType: "Tipo textual",
-  repertoire: "Repertório legítimo e produtivo",
-  project: "Projeto de texto",
-  coherence: "Coerência e argumentação",
-  interparagraphCohesion: "Coesão interparágrafos",
-  intraparagraphCohesion: "Coesão intraparágrafos",
-  cohesionInadequacies: "Inadequações coesivas",
+  grammar: "Norma e ortografia",
+  syntax: "Estrutura das frases",
+  theme: "Atendimento ao tema",
+  textType: "Tipo de texto",
+  repertoire: "Repertório",
+  project: "Organização dos argumentos",
+  coherence: "Coerência",
+  interparagraphCohesion: "Ligação entre parágrafos",
+  intraparagraphCohesion: "Ligação entre frases",
+  cohesionInadequacies: "Problemas de coesão",
 };
 
 const checklistLabels: Record<string, string> = {
@@ -179,19 +179,34 @@ export function createCorrectionPdf(result: CorrectionPdfData) {
     setColor("navy");
     doc.text(wrapped(item.title, 11, contentWidth - 86), margin + 70, y + 5);
     y += 47;
-    paragraph(item.summary, 9, "ink", 6);
+    paragraph(item.summary, 9.5, "ink", 8);
     ensureSpace(18);
     fillColor("line");
     doc.roundedRect(margin + 12, y - 2, contentWidth - 24, 6, 3, 3, "F");
     fillColor("blue");
     doc.roundedRect(margin + 12, y - 2, (contentWidth - 24) * Math.max(0, Math.min(item.score / 200, 1)), 6, 3, 3, "F");
     y += 18;
-    item.protocolFindings && Object.entries(item.protocolFindings).forEach(([key, value]) => {
-      paragraph(`${protocolLabels[key] ?? key}: ${value}`, 8.5, "muted", 5);
-    });
-    item.details.slice(0, 4).forEach(detail => paragraph(`Observação: ${detail}`, 8.5, "ink", 4));
-    item.evidence.slice(0, 3).forEach(evidence => paragraph(`Evidência: ${evidence}`, 8.5, "ink", 4));
-    paragraph(`Veredito: ${item.verdict}`, 9, "navy", 15, true);
+
+    const miniHeading = (title: string) => {
+      ensureSpace(18);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8.5);
+      setColor("blue");
+      doc.text(title.toUpperCase(), margin, y);
+      y += 13;
+    };
+    const bulletLines = (values: string[], kind: keyof typeof colors = "ink") => {
+      values.slice(0, 4).forEach(value => paragraph(`• ${value}`, 8.7, kind, 3));
+    };
+
+    miniHeading("O que foi observado");
+    bulletLines(item.details);
+    miniHeading("Evidências no texto");
+    bulletLines(item.evidence);
+    miniHeading("Mapa dos critérios");
+    bulletLines(Object.entries(item.protocolFindings ?? {}).map(([key, value]) => `${protocolLabels[key] ?? key}: ${value}`), "muted");
+    miniHeading("Conclusão");
+    paragraph(item.verdict, 9.5, "navy", 15, true);
   };
 
   fillColor("navy");

@@ -59,3 +59,7 @@
   - Endpoint, testes e build validados; interação manual no navegador permanece para confirmação
 
 - [x] Renomear o suporte contextual para Jamily na interface e no servidor
+
+- [x] Reformular os textos estranhos do PDF para linguagem clara e natural
+- [x] Simplificar a apresentação das competências e dos achados
+- [x] Renderizar e revisar visualmente o PDF reformulado
