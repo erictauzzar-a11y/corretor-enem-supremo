@@ -64,8 +64,9 @@
 - [x] Simplificar a apresentação das competências e dos achados
 - [x] Renderizar e revisar visualmente o PDF reformulado
 
-- [ ] Sincronizar todas as alterações do projeto com o repositório GitHub
-- [ ] Confirmar que nenhum segredo ou arquivo `.env` será enviado
-- [ ] Atualizar documentação para a próxima IA encontrar o estado atual
+- [x] Sincronizar todas as alterações do projeto com o repositório GitHub
+- [x] Confirmar que nenhum segredo ou arquivo `.env` será enviado
+- [x] Atualizar documentação para a próxima IA encontrar o estado atual
 
-- [ ] Exportar o commit local a968f44 para erictauzzar-a11y/corretor-enem-supremo na branch main usando o conector GitHub
+- [x] Exportar o commit local a968f44 para erictauzzar-a11y/corretor-enem-supremo na branch main usando o conector GitHub
+  - O estado enviado inclui o histórico mesclado e está na descendência de a968f44
