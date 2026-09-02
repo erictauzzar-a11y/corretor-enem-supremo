@@ -159,10 +159,10 @@ Observação: a conta Stripe conectada ao ambiente atual retornou que aceita ape
 
 ## Handoff e sincronização final com GitHub
 
-- [ ] Criar documentação objetiva para a próxima pessoa ou IA continuar o projeto AprovAI
-- [ ] Revisar arquivos sensíveis e confirmar que nenhum secret será enviado
-- [ ] Validar testes, typecheck e build antes do commit
-- [ ] Commitar o estado atual na branch main
-- [ ] Enviar o commit para erictauzzar-a11y/corretor-enem-supremo
-- [ ] Confirmar que o SHA local e o SHA remoto são iguais
-- [ ] Confirmar que a árvore local ficou limpa após o push
+- [x] Criar documentação objetiva para a próxima pessoa ou IA continuar o projeto AprovAI
+- [x] Revisar arquivos sensíveis e confirmar que nenhum secret será enviado
+- [x] Validar testes, typecheck e build antes do commit
+- [x] Commitar o estado atual na branch main
+- [x] Enviar o commit para erictauzzar-a11y/corretor-enem-supremo
+- [x] Confirmar que o SHA local e o SHA remoto são iguais
+- [x] Confirmar que a árvore local ficou limpa após o push
