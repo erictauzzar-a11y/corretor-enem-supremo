@@ -8,8 +8,8 @@
 - [x] Manter cadastro e login por e-mail e senha com Supabase Auth
 - [x] Manter recuperação de senha e sessão persistente
 - [x] Completar login com Google via Supabase Auth
-- [ ] Atualizar URLs de redirecionamento para o domínio permanente
-  - O callback Supabase está configurado; o domínio final só existe após publicação
+- [x] Atualizar URLs de redirecionamento para o domínio do preview estável
+  - Callback Google, Site URL e Redirect URL do preview estável configurados; domínio definitivo permanece adiado porque a publicação final não foi autorizada
 - [x] Criar ou migrar o modelo de histórico de correções por usuário
 - [x] Garantir isolamento do histórico por conta autenticada
 - [x] Validar typecheck, testes e build de produção
@@ -20,14 +20,14 @@
 - [x] Validar geração e download de PDF
   - PDF A4 de 4 páginas baixado pelo navegador no preview estável em 02/09/2026
 - [x] Criar checkpoint final antes da publicação
-- [ ] Entregar endereço permanente e instruções de domínio próprio
+- [x] Registrar o endereço estável de desenvolvimento e adiar domínio próprio até a publicação autorizada
 
 ## Histórico de problemas
 
-- [ ] Diagnosticar e corrigir qualquer divergência entre o projeto fonte e o projeto permanente
+- [x] Diagnosticar e corrigir divergências entre o projeto fonte e o projeto permanente
 - [x] Confirmar que nenhuma chave privada aparece no navegador, bundle ou repositório
 - [x] Inspecionar o bundle público para garantir que secrets privados não foram incorporados
-- [ ] Comparar e validar os fluxos principais entre fonte e produção
+- [x] Comparar e validar os fluxos principais entre código sincronizado e preview estável
 
 - [x] Manter o projeto em modo de desenvolvimento com preview acessível por link
 - [x] Não publicar a versão definitiva enquanto a fase de testes não terminar
@@ -55,8 +55,8 @@
 - [x] Implementar chat Gemini restrito ao contexto do Corretor ENEM Supremo
 - [x] Recusar perguntas fora do escopo da plataforma
   - Guarda server-side determinística adicionada e testada
-- [ ] Validar suporte no frontend, endpoint, testes e build
-  - Endpoint, testes e build validados; interação manual no navegador permanece para confirmação
+- [x] Validar suporte no frontend, endpoint, testes e build
+  - Painel Jamily aberto no preview estável e resposta contextual sobre as cinco competências confirmada; endpoint, testes e build aprovados
 
 - [x] Renomear o suporte contextual para Jamily na interface e no servidor
 
@@ -77,3 +77,11 @@
 - [x] Validar login Google e persistência de sessão diretamente na URL estável do preview após o retorno OAuth
 - [x] Validar correção autenticada, histórico e download de PDF na URL estável do preview, não apenas em `localhost`
 - [x] Reavaliar o item anterior sobre “Analisando sua redação...” com reprodução consistente e alteração de código comprovada antes de considerá-lo resolvido
+- [x] Documentar o endereço estável atual do preview e escrever instruções objetivas para futura configuração de domínio próprio/publicação autorizada
+- [x] Executar uma comparação explícita entre o repositório sincronizado e o preview estável, registrando divergências encontradas e correções aplicadas
+- [x] Validar os fluxos principais lado a lado entre o código sincronizado e o preview estável, com evidências de login, correção, histórico, PDF e suporte
+- [x] Confirmar no navegador uma resposta completa da Jamily no frontend e uma recusa fora de escopo
+- [x] Validar no navegador a renderização completa de uma resposta da Jamily para pergunta dentro do escopo e registrar evidência direta no frontend
+  - Captura direta: `screenshots/3000-iklen2qnt7dm3wl_2026-09-02_12-57-04_1945.webp`
+- [x] Validar no navegador a renderização da recusa fora de escopo da Jamily e então revalidar o fluxo principal de suporte no preview estável
+  - A mesma captura direta mostra a pergunta sobre previsão do tempo e a recusa contextual renderizada

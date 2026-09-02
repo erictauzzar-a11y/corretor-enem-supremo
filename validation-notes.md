@@ -11,3 +11,25 @@ O arquivo `/home/ubuntu/Downloads/relatorio-corretor-enem-1000.pdf` foi baixado 
 O Supabase Auth foi atualizado com Site URL e Redirect URL `https://3000-iklen2qnt7dm3wl0tbehq-6b5986f0.us4.manus.computer`. Em nova tentativa, o retorno OAuth permaneceu nessa URL e o site exibiu `eric.tauzz.ar@gmail.com` e `Sair`. O histórico carregou diretamente no domínio estável com a correção de 1000/1000.
 
 A correção foi executada novamente no domínio estável; após o tempo normal de processamento, a interface saiu de “Analisando sua redação...” e exibiu o resultado completo com nota 1000/1000. O botão Baixar PDF gerou `relatorio-corretor-enem-1000 (1).pdf`, identificado pelo navegador como originado do domínio estável. Portanto, o loading observado anteriormente não foi uma falha persistente nem exigiu alteração de código: era o tempo de resposta do Gemini.
+
+## Comparação código sincronizado versus preview
+
+O repositório local e o repositório GitHub `erictauzzar-a11y/corretor-enem-supremo` foram comparados pelo commit da branch `main`: ambos apontam para `a19a425174e63ff4f2bbc81d0b65f158ce2df33b`. Não restaram divergências de código entre o estado sincronizado e o preview estável. A comparação funcional confirmou os mesmos fluxos previstos na aplicação: autenticação Google, correção por texto, persistência no histórico, relatório PDF e suporte Jamily.
+
+## Validação completa da Jamily no frontend
+
+No preview estável autenticado, o painel `Suporte do Corretor` foi aberto e exibiu a saudação da Jamily. A pergunta dentro do escopo “Como funciona a correção por competências do ENEM?” foi enviada e a resposta renderizada explicou as cinco competências e a soma de 1000 pontos. Em seguida, a pergunta fora do escopo “Qual é a previsão do tempo hoje?” foi enviada; o frontend recebeu HTTP 200 e exibiu a recusa determinística: “Posso ajudar apenas com o Corretor ENEM Supremo, redação do ENEM, histórico, autenticação e relatórios em PDF.”
+
+## Domínio próprio futuro
+
+As instruções de publicação e configuração de domínio próprio foram documentadas em `DOMAIN.md`. Nenhuma publicação definitiva foi executada, conforme solicitado.
+
+## Evidência direta do painel Jamily
+
+O painel do chat foi aberto no preview estável. A captura do navegador mostrou a pergunta dentro do escopo e a resposta renderizada começando por “A correção da redação do ENEM é dividida em 5 competências...”. O DOM confirmou o contêiner interno do chat com conteúdo rolável de 1068px e o posicionamento no final foi aplicado para expor as mensagens mais recentes. A chamada fora de escopo retornou HTTP 200 com `inScope: false` e a resposta determinística registrada nos logs do navegador.
+
+A captura final do navegador (`/home/ubuntu/screenshots/3000-iklen2qnt7dm3wl_2026-09-02_12-55-53_3236.webp`) mostra diretamente no painel da Jamily a mensagem de recusa “Posso ajudar apenas com o Corretor ENEM Supremo, redação do ENEM, histórico, autenticação e relatórios em PDF.” A mensagem contextual sobre as cinco competências também aparece no histórico imediatamente acima, com o chat rolado ao final.
+
+## Evidência visual ampliada do chat
+
+Para tornar a auditoria inequívoca, o painel do chat foi expandido temporariamente apenas no navegador e rolado ao trecho correspondente. A captura `/home/ubuntu/screenshots/3000-iklen2qnt7dm3wl_2026-09-02_12-57-04_1945.webp` mostra diretamente no frontend a resposta da Jamily explicando as cinco competências, cada uma valendo até 200 pontos, totalizando 1000, e a mensagem posterior de recusa para “Qual é a previsão do tempo hoje?”: “Posso ajudar apenas com o Corretor ENEM Supremo, redação do ENEM, histórico, autenticação e relatórios em PDF.” A alteração de tamanho foi somente um ajuste de inspeção no DOM do navegador e não foi gravada no código da aplicação.
