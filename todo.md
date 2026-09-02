@@ -16,7 +16,7 @@
 - [ ] Validar autenticação e persistência no preview de produção
   - Requer teste com uma conta real após o primeiro publish
 - [ ] Validar correção por texto e imagem com Gemini
-  - Requer execução ponta a ponta no preview publicado
+  - Correção de texto validada no preview; imagem permanece para teste multimodal
 - [ ] Validar geração e download de PDF
   - Requer uma correção concluída no preview publicado
 - [x] Criar checkpoint final antes da publicação
@@ -25,9 +25,15 @@
 ## Histórico de problemas
 
 - [ ] Diagnosticar e corrigir qualquer divergência entre o projeto fonte e o projeto permanente
-- [ ] Confirmar que nenhuma chave privada aparece no navegador, bundle ou repositório
+- [x] Confirmar que nenhuma chave privada aparece no navegador, bundle ou repositório
 - [x] Inspecionar o bundle público para garantir que secrets privados não foram incorporados
 - [ ] Comparar e validar os fluxos principais entre fonte e produção
 
 - [x] Manter o projeto em modo de desenvolvimento com preview acessível por link
 - [x] Não publicar a versão definitiva enquanto a fase de testes não terminar
+
+- [ ] Continuar as validações ponta a ponta no preview sem publicar a versão definitiva
+- [ ] Corrigir e validar qualquer erro restante no login Google
+- [ ] Validar correção, histórico por conta e geração de PDF no preview
+
+- [x] Atualizar o modelo Gemini indisponível para o modelo recomendado pelo gateway
