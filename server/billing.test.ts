@@ -4,15 +4,15 @@ import { ANNUAL_PRICE_BRL, buildCheckoutParameters, getCorrectionAccess, handleS
 import { toFreeCorrection } from "./routers";
 
 describe("billing access", () => {
-  it("defines the annual offer at R$ 37", () => {
-    expect(ANNUAL_PRICE_BRL).toBe(3700);
+  it("defines the annual offer at R$ 53.90", () => {
+    expect(ANNUAL_PRICE_BRL).toBe(5390);
   });
 
   it("builds a yearly BRL checkout linked to the authenticated user", () => {
     const params = buildCheckoutParameters({ openId: "user-123", email: "aluno@example.com", name: "Aluno", id: 1, role: "user", createdAt: new Date(), updatedAt: new Date(), lastSignedIn: new Date() }, "https://corretor.example");
     expect(params.mode).toBe("subscription");
     expect(params.line_items[0]?.price_data.currency).toBe("brl");
-    expect(params.line_items[0]?.price_data.unit_amount).toBe(3700);
+    expect(params.line_items[0]?.price_data.unit_amount).toBe(5390);
     expect(params.line_items[0]?.price_data.recurring.interval).toBe("year");
     expect(params.client_reference_id).toBe("user-123");
     expect(params.metadata.user_open_id).toBe("user-123");

@@ -3,6 +3,6 @@ export const ANNUAL_PLAN = {
   name: "AprovAI — Plano Anual",
   description: "Correções ilimitadas por texto e imagem, histórico, PDF e análise pedagógica completa.",
   currency: "brl" as const,
-  unitAmount: 3700,
+  unitAmount: 5390,
   recurring: { interval: "year" as const },
 };
