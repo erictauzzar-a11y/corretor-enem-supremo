@@ -1,6 +1,5 @@
 import Stripe from "stripe";
 import type { Response } from "express";
-import { ENV } from "./_core/env";
 import { getBillingAccount, getBillingAccountByCustomerId, upsertBillingAccount } from "./db";
 import { ANNUAL_PLAN } from "./products";
 import type { User } from "../drizzle/schema";
@@ -29,7 +28,7 @@ export function getCorrectionAccess(account: Awaited<ReturnType<typeof getBillin
 export function buildCheckoutParameters(user: User, origin: string, customerId?: string) {
   return {
     mode: "subscription" as const,
-    line_items: [{ price_data: { currency: ANNUAL_PLAN.currency, product_data: { name: ANNUAL_PLAN.name, description: ANNUAL_PLAN.description }, unit_amount: ANNUAL_PLAN.unitAmount, recurring: ANNUAL_PLAN.recurring }, quantity: 1 }],
+    line_items: [{ price: ANNUAL_PLAN.stripePriceId, quantity: 1 }],
     customer: customerId ?? undefined,
     customer_email: customerId ? undefined : user.email ?? undefined,
     client_reference_id: user.openId,

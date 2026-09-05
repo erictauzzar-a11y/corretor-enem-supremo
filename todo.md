@@ -110,11 +110,11 @@
 
 ## Venda da plataforma — assinatura anual
 
-- [x] Definir a oferta anual do AprovAI por R$ 37,00
+- [x] Definir a oferta anual do AprovAI por R$ 53,90
 - [x] Adicionar área de compra e apresentação da oferta no site
   - Oferta visual validada no preview; imagem bloqueada para contas sem plano e CTA anual exibido
 - [x] Configurar integração de pagamentos com checkout seguro
-- [ ] Criar produto/preço anual em modo de teste
+- [x] Criar o Price anual recorrente em produção no Stripe (`price_1UC9OAGx475CvFbvIMGq9f0u`)
 - [x] Implementar criação de checkout vinculada ao usuário autenticado
 - [x] Processar confirmação por webhook assinado
 - [x] Liberar acesso somente após pagamento confirmado
@@ -122,7 +122,7 @@
 - [x] Tratar cancelamento, expiração e falha de pagamento
 - [x] Adicionar testes Vitest para checkout, webhook e autorização
   - 21 testes aprovados, incluindo parâmetros de checkout, webhook assinado, política freemium e sanitização premium
-- [ ] Validar a experiência de compra em ambiente de teste
+- [ ] Validar a experiência de compra em ambiente de teste/produção sem concluir cobrança
 - [x] Configurar secrets de pagamento fora do código e do GitHub
 - [ ] Criar checkpoint da estrutura comercial antes da publicação
 
@@ -132,18 +132,18 @@
 - [x] Liberar exatamente uma correção gratuita por texto para cada conta elegível
 - [x] Bloquear correção gratuita por imagem
 - [x] Bloquear PDF e análises pedagógicas no plano gratuito
-- [x] Criar plano pago anual de R$ 37,00 com renovação automática
+- [x] Criar plano pago anual de R$ 53,90 com renovação automática
 - [x] Liberar correção por texto e imagem, PDF, análises pedagógicas, histórico e suporte no plano pago
 - [x] Remover o limite de correções enquanto a assinatura paga estiver ativa
 - [x] Manter o histórico isolado por usuário em ambas as modalidades
 
-## Bloqueio operacional encontrado no Stripe
+## Estado operacional do Stripe
 
-- [ ] Ativar suporte a BRL na conta Stripe de teste ou configurar chaves de uma conta brasileira
+- [x] Ativar suporte a BRL e criar o Price recorrente anual de R$ 53,90
 - [ ] Validar uma sessão real de checkout em BRL sem concluir cobrança
 - [ ] Confirmar webhook de assinatura no ambiente Stripe com BRL habilitado
 
-Observação: a conta Stripe conectada ao ambiente atual retornou que aceita apenas ARS. O produto permanece corretamente configurado em BRL por R$ 37,00; não foi feita conversão silenciosa para outra moeda.
+Observação: o Price ativo de produção é `price_1UC9OAGx475CvFbvIMGq9f0u`. O checkout do backend usa esse Price ID diretamente; ainda falta validar o fluxo de checkout e webhook.
 
 ## Renomeação da marca para AprovAI
 

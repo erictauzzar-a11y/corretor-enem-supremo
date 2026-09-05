@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import Stripe from "stripe";
 import { ANNUAL_PRICE_BRL, buildCheckoutParameters, getCorrectionAccess, handleStripeWebhook, hasPaidAccess } from "./billing";
 import { toFreeCorrection } from "./routers";
+import { ANNUAL_PLAN } from "./products";
 
 describe("billing access", () => {
   it("defines the annual offer at R$ 53.90", () => {
@@ -11,9 +12,8 @@ describe("billing access", () => {
   it("builds a yearly BRL checkout linked to the authenticated user", () => {
     const params = buildCheckoutParameters({ openId: "user-123", email: "aluno@example.com", name: "Aluno", id: 1, role: "user", createdAt: new Date(), updatedAt: new Date(), lastSignedIn: new Date() }, "https://corretor.example");
     expect(params.mode).toBe("subscription");
-    expect(params.line_items[0]?.price_data.currency).toBe("brl");
-    expect(params.line_items[0]?.price_data.unit_amount).toBe(5390);
-    expect(params.line_items[0]?.price_data.recurring.interval).toBe("year");
+    expect(params.line_items[0]?.price).toBe(ANNUAL_PLAN.stripePriceId);
+    expect(ANNUAL_PLAN.stripePriceId).toBe("price_1UC9OAGx475CvFbvIMGq9f0u");
     expect(params.client_reference_id).toBe("user-123");
     expect(params.metadata.user_open_id).toBe("user-123");
   });

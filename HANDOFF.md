@@ -12,7 +12,7 @@ A aplicação possui cadastro e login com Supabase Auth, sessão persistente, lo
 
 O modelo comercial é freemium. Toda pessoa precisa criar uma conta. O plano gratuito permite uma correção por texto, bloqueia imagem, PDF e análise pedagógica detalhada. O plano AprovAI pago libera correções ilimitadas por texto e imagem, PDF, histórico e análises pedagógicas completas.
 
-O preço-alvo está centralizado em `server/products.ts` como `5390` centavos em BRL, com recorrência anual. A criação do novo Price em produção permanece como etapa final após a liberação da conta Stripe. O checkout é criado no backend em `server/billing.ts`, e o webhook assinado está registrado em `/api/stripe/webhook`. O sistema processa confirmação, assinatura ativa, cancelamento, falha de pagamento e checkout expirado.
+O preço anual está centralizado em `server/products.ts` como `5390` centavos em BRL, com recorrência anual. O Price real de produção foi criado no Stripe com ID `price_1UC9OAGx475CvFbvIMGq9f0u`, e o checkout em `server/billing.ts` usa esse ID diretamente. O webhook assinado está registrado em `/api/stripe/webhook`. O sistema processa confirmação, assinatura ativa, cancelamento, falha de pagamento e checkout expirado.
 
 ## Variáveis e secrets
 
@@ -36,7 +36,7 @@ Após a renomeação para AprovAI, a suíte passou com 22 testes, o typecheck pa
 
 ## Pendências conhecidas
 
-A conta Stripe atualmente conectada ao ambiente de teste aceita ARS e rejeita BRL. O código deve continuar configurado em BRL para o preço de R$ 53,90; não converter silenciosamente para ARS. Quando o proprietário ativar BRL ou conectar uma conta brasileira, validar uma sessão de checkout e o webhook em modo de teste.
+A conta Stripe de produção agora possui BRL habilitado e o preço anual recorrente ativo de R$ 53,90, usando o Price ID `price_1UC9OAGx475CvFbvIMGq9f0u`. Ainda é necessário validar uma sessão de checkout sem concluir cobrança e confirmar o webhook no ambiente de produção.
 
 Também é necessário clicar em **Publish** para criar a URL HTTPS permanente. Depois, atualizar no Supabase a Site URL e as Redirect URLs para o domínio publicado e validar login, correção, histórico e PDF em produção.
 

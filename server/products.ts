@@ -5,4 +5,5 @@ export const ANNUAL_PLAN = {
   currency: "brl" as const,
   unitAmount: 5390,
   recurring: { interval: "year" as const },
+  stripePriceId: "price_1UC9OAGx475CvFbvIMGq9f0u",
 };
